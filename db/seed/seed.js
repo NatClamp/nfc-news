@@ -31,5 +31,4 @@ exports.seed = function (knex, Promise) {
       const formattedComments = formatComments(commentData, articleLookupObj, userLookObj);
       return knex('comments').insert(formattedComments).returning('*');
     });
-  // .then(commentRows => commentRows);
 };
