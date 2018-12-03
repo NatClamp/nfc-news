@@ -26,12 +26,21 @@ exports.articleLookup = (articles) => {
   return articleLookup;
 };
 
-exports.formatComments = (data, articleLookup) => {
+exports.formatComments = (data, articleLookup, userLookup) => {
   const formattedComments = data.map((comment) => {
     const date = moment(data.created_at).format('DD-MM-YYYY hh:mm:ss');
     comment.created_at = date;
-    comment.belongs_to = articleLookup[comment.belongs_to];
-    return comment;
+    comment.article_id = articleLookup[comment.belongs_to];
+    // get rid of delete, just make new object with stuff you want in
+    // delete comment.belongs_to;
+    comment.user_id = userLookup[comment.created_by];
+    const {
+      body, votes, user_id, created_at, article_id,
+    } = comment;
+    return {
+      body, votes, user_id, created_at, article_id,
+    };
   });
+  console.log(formattedComments, '<======== LOOK AT ME');
   return formattedComments;
 };

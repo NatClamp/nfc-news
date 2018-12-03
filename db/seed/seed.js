@@ -24,17 +24,17 @@ exports.seed = function (knex, Promise) {
     .then((usersRows) => {
       const userLookObj = userLookup(usersRows);
       const formattedArticles = formatArticles(articleData, userLookObj);
-      return knex('articles').insert(formattedArticles).returning('*');
+      return Promise.all([userLookObj, knex('articles').insert(formattedArticles).returning('*')]);
     })
-    .then((articlesRows) => {
+    .then(([userLookObj, articlesRows]) => {
+      console.log(articlesRows);
       const articleLookupObj = articleLookup(articlesRows);
-      const formattedComments = formatComments(commentData, articleLookupObj);
-      console.log(formattedComments);
+      const formattedComments = formatComments(commentData, articleLookupObj, userLookObj);
       return knex('comments')
         .insert(formattedComments)
         .returning('*');
     })
     .then((commentRows) => {
-      console.log(commentRows);
+      console.log('hello', '<------- COMMENT ROWS HERE, FINAL THEN BLOCK');
     });
 };
