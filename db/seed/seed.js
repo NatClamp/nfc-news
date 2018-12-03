@@ -26,15 +26,10 @@ exports.seed = function (knex, Promise) {
       const formattedArticles = formatArticles(articleData, userLookObj);
       return Promise.all([userLookObj, knex('articles').insert(formattedArticles).returning('*')]);
     })
-    .then(([userLookObj, articlesRows]) => {
-      console.log(articlesRows);
-      const articleLookupObj = articleLookup(articlesRows);
+    .then(([userLookObj, articleRows]) => {
+      const articleLookupObj = articleLookup(articleRows);
       const formattedComments = formatComments(commentData, articleLookupObj, userLookObj);
-      return knex('comments')
-        .insert(formattedComments)
-        .returning('*');
-    })
-    .then((commentRows) => {
-      console.log('hello', '<------- COMMENT ROWS HERE, FINAL THEN BLOCK');
+      return knex('comments').insert(formattedComments).returning('*');
     });
+  // .then(commentRows => commentRows);
 };
