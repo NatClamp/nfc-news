@@ -4,7 +4,9 @@ const {
   articleData,
   commentData,
 } = require('../data/test-data');
-const { formattedArticles } = require('../utils/utils');
+const {
+  userLookup, formatArticles, articleLookup, formatComments,
+} = require('../utils/utils');
 
 exports.seed = function (knex, Promise) {
   return Promise.all([
@@ -20,13 +22,18 @@ exports.seed = function (knex, Promise) {
       .insert(userData)
       .returning('*'))
     .then((usersRows) => {
-      const formattedArticleData = formattedArticles();
-      console.log(formattedArticleData);
-      return knex('articles').insert(formattedArticleData).returning('*');
+      const userLookObj = userLookup(usersRows);
+      const formattedArticles = formatArticles(articleData, userLookObj);
+      return knex('articles').insert(formattedArticles).returning('*');
     })
-    .then(articlesRows => knex('comments')
-      .insert(commentData)
-      .returns('*'))
+    .then((articlesRows) => {
+      const articleLookupObj = articleLookup(articlesRows);
+      const formattedComments = formatComments(commentData, articleLookupObj);
+      console.log(formattedComments);
+      return knex('comments')
+        .insert(formattedComments)
+        .returning('*');
+    })
     .then((commentRows) => {
       console.log(commentRows);
     });
