@@ -6,12 +6,12 @@
   "scripts": {
     "test": "mocha ./spec/*",
     "dev": "nodemon listen.js",
+    "migrate:make": "knex migrate:make",
+    "seed:run": "knex migrate:rollback --env test && knex migrate:latest --env test && NODE_ENV=test knex seed:run --env test",
     "lint": "eslint ./",
     "lint:fix": "eslint --fix ./",
     "pre-commit": "npm t",
-    "posttest": "npm run lint",
-    "migrate:make": "knex migrate:make",
-    "seed:run": "knex migrate:rollback --env test && knex migrate:latest --env test && NODE_ENV=test knex seed:run --env test"
+    "posttest": "npm run lint"
   },
   "repository": {
     "type": "git",
