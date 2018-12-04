@@ -34,7 +34,8 @@ exports.getArticlesWithTopic = (req, res, next) => {
       if (sort_ascending) articleQuery.orderBy(sort_by, 'asc');
     })
     .then((articles) => {
-      res.status(200).send({ articles });
+      if (articles.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      return res.status(200).send({ articles });
     })
     .catch(next);
 };

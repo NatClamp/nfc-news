@@ -86,13 +86,20 @@ describe('/', () => {
           });
       });
       describe('/:topics/articles', () => {
-        it('GET - responds with 200 and an array of article objects for the chosen topic with default values for limit, sort_by and order', () => request.get('/api/topics/mitch/articles')
+        it('GET - responds with 200 and an array of article objects for the chosen topic with default values for limit, sort_by and order', () => request
+          .get('/api/topics/mitch/articles')
           .expect(200)
           .then((res) => {
             expect(res.body.articles[0].topic).to.eql('mitch');
             expect(res.body.articles[0]).to.have.keys('article_id', 'title', 'author', 'votes', 'created_at', 'topic', 'comment_count');
             expect(res.body.articles).to.have.length(10);
             expect(res.body.articles[0].article_id).to.equal(1);
+          }));
+        it('ERROR - responds with status 404 if client enters topic that does not exist', () => request
+          .get('/api/topics/puppies/articles')
+          .expect(404)
+          .then((res) => {
+            expect(res.body.message).to.equal('Page not found');
           }));
         it('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/topics/mitch/articles?limit=3')
           .expect(200)
