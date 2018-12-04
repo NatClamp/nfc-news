@@ -19,7 +19,9 @@ exports.getArticlesWithTopic = (req, res, next) => {
   const { topic } = (req.params);
   return connection('topics')
     .select('*')
-    .where('slug', topic)
+    .join('articles', 'topics.slug', '=', 'articles.topic')
+    // .join('users', 'articles.created_by', '=', 'users.username')
+    .where('topics.slug', topic)
     .then((articles) => {
       res.status(200).send({ articles });
     })
