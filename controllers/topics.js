@@ -24,6 +24,7 @@ exports.getArticlesWithTopic = (req, res, next) => {
     .select('articles.article_id', 'title', 'username AS author', 'articles.votes', 'articles.created_at', 'articles.topic')
     .limit(limit)
     .offset((p - 1) * limit)
+    .orderBy(sort_by, 'desc')
     .where('topic', topic)
     .join('users', 'created_by', '=', 'users.user_id')
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
@@ -31,7 +32,6 @@ exports.getArticlesWithTopic = (req, res, next) => {
     .groupBy('articles.article_id', 'users.username')
     .modify((articleQuery) => {
       if (sort_ascending) articleQuery.orderBy(sort_by, 'asc');
-      else articleQuery.orderBy(sort_by, 'desc');
     })
     .then((articles) => {
       res.status(200).send({ articles });

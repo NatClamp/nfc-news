@@ -54,7 +54,7 @@ describe('/api', () => {
           expect(res.body.articles[0].topic).to.eql('mitch');
           expect(res.body.articles[0]).to.have.keys('article_id', 'title', 'author', 'votes', 'created_at', 'topic', 'comment_count');
           expect(res.body.articles).to.have.length(10);
-          expect(res.body.articles[0].article_id).to.equal(12);
+          expect(res.body.articles[0].article_id).to.equal(1);
         }));
       it('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/topics/mitch/articles?limit=3')
         .expect(200)
@@ -62,19 +62,19 @@ describe('/api', () => {
           expect(res.body.articles).to.have.length(3);
         }));
       it('GET - responds with 200 and an array of article objects, sort applied by client in query', () => request.get('/api/topics/mitch/articles?sort_by=article_id')
-          .expect(200)
-          .then((res) => {
-            expect(res.body.articles[0].article_id).to.equal(1);
-          }));
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].article_id).to.equal(12);
+        }));
       it('GET - responds with 200 and an array of article objects, starting at page specified in query', () => request.get('/api/topics/mitch/articles?p=2&limit=2')
         .expect(200)
         .then((res) => {
-          expect(res.body.articles[0].article_id).to.equal(10);
+          expect(res.body.articles[0].article_id).to.equal(3);
         }));
       it('GET - responds with 200 and an array of article objects, sorted to ascending if specified in query', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
         .expect(200)
         .then((res) => {
-          expect(res.body.articles[0].article_id).to.equal(0);
+          expect(res.body.articles[0].article_id).to.equal(1);
         }));
     });
   });
