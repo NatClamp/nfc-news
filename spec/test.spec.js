@@ -47,11 +47,13 @@ describe('/api', () => {
     // it.skip('ERROR - responds with 422 if client enters non-unique slug', () => {
     //   // need to write this test!
     // });
-    it('GET - responds with 200 and an array of article objects for the chosen topic', () => request.get('/api/topics/mitch/articles')
-      .expect(200)
-      .then((res) => {
-        console.log(res.body);
-        expect(res.body.articles[0].topic).to.eql('mitch');
-      }));
+    describe('/:topic/articles', () => {
+      it('GET - responds with 200 and an array of article objects for the chosen topic', () => request.get('/api/topics/mitch/articles')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].topic).to.eql('mitch');
+          expect(res.body.articles[0]).to.have.keys('article_id', 'title', 'author', 'votes', 'created_at', 'topic', 'comment_count');
+        }));
+    });
   });
 });

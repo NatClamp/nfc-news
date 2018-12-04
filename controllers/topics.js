@@ -18,9 +18,12 @@ exports.addATopic = (req, res, next) => {
 exports.getArticlesWithTopic = (req, res, next) => {
   const { topic } = (req.params);
   return connection('articles')
-    .select('article_id', 'title', 'username AS author', 'votes', 'created_at', 'topic')
-    .join('users', 'created_by', '=', 'users.user_id')
+    .select('articles.article_id', 'title', 'username AS author', 'articles.votes', 'articles.created_at', 'articles.topic')
     .where('topic', topic)
+    .join('users', 'created_by', '=', 'users.user_id')
+    .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+    .count('comments.article_id AS comment_count')
+    .groupBy('articles.article_id', 'users.username')
     .then((articles) => {
       res.status(200).send({ articles });
     })
