@@ -11,9 +11,9 @@ app.use(bodyParser.json());
 app.use('/api', router);
 
 app.use('/*', (req, res, next) => {
-  handle404();
+  next({ status: 404, message: 'Page not found' });
 });
 
-// app.use(handle404);
+app.use(handle404);
 
 module.exports = app;

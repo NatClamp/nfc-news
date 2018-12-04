@@ -13,6 +13,13 @@ describe('/api', () => {
     .then(() => connection.seed.run()));
   after(() => connection.destroy());
 
+  it('Error - responds with status 404 if the client enters an endpoint that does not exist', () => {
+    request.get('/api/nonexistent')
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).to.eql('Page not found');
+      });
+  });
   describe('/topics', () => {
     it('GET - responds with status 200 and an array of topic object', () => request
       .get('/api/topics')
