@@ -10,3 +10,7 @@ exports.handle422 = (err, req, res, next) => {
   if (err.code === '23505') res.status(422).send({ message: 'This key already exists' });
   else next(err);
 };
+
+exports.handle405 = (req, res, next) => {
+  res.status(405).send({ message: 'METHOD NOT ALLOWED' });
+};
