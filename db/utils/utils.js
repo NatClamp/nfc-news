@@ -1,4 +1,5 @@
 exports.userLookup = (users) => {
+  // should refactor this to use reduce
   const userLookup = {};
   users.forEach((user) => {
     userLookup[user.username] = user.user_id;
