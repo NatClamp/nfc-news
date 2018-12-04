@@ -44,5 +44,12 @@ describe('/api', () => {
           });
         });
     });
+    it.skip('ERROR - responds with 422 if client enters non-unique slug', () => {});
+    it('GET - responds with 200 and an array of article objects for the chosen topic', () => request.get('/api/topics/mitch/articles')
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles[0].slug).to.eql('mitch');
+        expect(res.body.articles).to.have.length(1);
+      }));
   });
 });

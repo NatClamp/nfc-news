@@ -14,3 +14,14 @@ exports.addATopic = (req, res, next) => {
     .then(topic => res.status(201).send({ topic }))
     .catch(next);
 };
+
+exports.getArticlesWithTopic = (req, res, next) => {
+  const { topic } = (req.params);
+  return connection('topics')
+    .select('*')
+    .where('slug', topic)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
+};
