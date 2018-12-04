@@ -9,9 +9,15 @@ exports.userLookup = (users) => {
 
 exports.formatArticles = (data, userLookup) => {
   const formattedArticles = data.map((article) => {
-    article.created_at = new Date(article.created_at);
-    article.created_by = userLookup[article.created_by];
-    return article;
+    const cloneArticle = { ...article };
+    cloneArticle.created_at = new Date(article.created_at);
+    cloneArticle.created_by = userLookup[article.created_by];
+    const {
+      title, topic, created_by, body, created_at, votes,
+    } = cloneArticle;
+    return {
+      title, topic, created_by, body, created_at, votes,
+    };
   });
   return formattedArticles;
 };
@@ -26,12 +32,13 @@ exports.articleLookup = (articles) => {
 
 exports.formatComments = (data, articleLookup, userLookup) => {
   const formattedComments = data.map((comment) => {
-    comment.created_at = new Date(comment.created_at);
-    comment.article_id = articleLookup[comment.belongs_to];
-    comment.user_id = userLookup[comment.created_by];
+    const cloneComment = { ...comment };
+    cloneComment.created_at = new Date(comment.created_at);
+    cloneComment.article_id = articleLookup[comment.belongs_to];
+    cloneComment.user_id = userLookup[comment.created_by];
     const {
       body, votes, user_id, created_at, article_id,
-    } = comment;
+    } = cloneComment;
     return {
       body, votes, user_id, created_at, article_id,
     };

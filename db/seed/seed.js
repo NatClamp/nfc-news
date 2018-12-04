@@ -18,7 +18,7 @@ exports.seed = function (knex, Promise) {
     .then(() => knex('topics')
       .insert(topicData)
       .returning('*'))
-    .then(topicRows => knex('users')
+    .then(() => knex('users')
       .insert(userData)
       .returning('*'))
     .then((usersRows) => {
@@ -27,6 +27,7 @@ exports.seed = function (knex, Promise) {
       return Promise.all([userLookObj, knex('articles').insert(formattedArticles).returning('*')]);
     })
     .then(([userLookObj, articleRows]) => {
+      console.log(articleRows, '<----- reseeded articles');
       const articleLookupObj = articleLookup(articleRows);
       const formattedComments = formatComments(commentData, articleLookupObj, userLookObj);
       return knex('comments').insert(formattedComments).returning('*');
