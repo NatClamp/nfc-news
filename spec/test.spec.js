@@ -13,13 +13,11 @@ describe('/api', () => {
     .then(() => connection.seed.run()));
   after(() => connection.destroy());
 
-  it('Error - responds with status 404 if the client enters an endpoint that does not exist', () => {
-    request.get('/api/nonexistent')
-      .expect(404)
-      .then((res) => {
-        expect(res.body.message).to.eql('Page not found');
-      });
-  });
+  it('Error - responds with status 404 if the client enters an endpoint that does not exist', () => request.get('/api/nonexistent')
+    .expect(404)
+    .then((res) => {
+      expect(res.body.message).to.eql('Page not found');
+    }));
   describe('/topics', () => {
     it('GET - responds with status 200 and an array of topic object', () => request
       .get('/api/topics')
@@ -44,9 +42,18 @@ describe('/api', () => {
           });
         });
     });
-    // it.skip('ERROR - responds with 422 if client enters non-unique slug', () => {
-    //   // need to write this test!
-    // });
+    it('ERROR - responds with 422 if client enters non-unique slug', () => {
+      const newTopic = {
+        description: 'The only actual reason to be alive',
+        slug: 'cats',
+      };
+      return request.post('/api/topics')
+        .send(newTopic)
+        .expect(422)
+        .then((res) => {
+          expect(res.body.message).to.equal('This key already exists');
+        });
+    });
     describe('/:topics/articles', () => {
       it('GET - responds with 200 and an array of article objects for the chosen topic with default values for limit, sort_by and order', () => request.get('/api/topics/mitch/articles')
         .expect(200)

@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const router = require('./routes/api');
-const { handle404 } = require('./errors/index');
+const { handle404, handle422 } = require('./errors/index');
 
 
 app.use(bodyParser.json());
@@ -15,5 +15,6 @@ app.use('/*', (req, res, next) => {
 });
 
 app.use(handle404);
+app.use(handle422);
 
 module.exports = app;
