@@ -11,6 +11,11 @@ exports.handle422 = (err, req, res, next) => {
   else next(err);
 };
 
+exports.handle400 = (err, req, res, next) => {
+  if (err.code === '42703') res.status(400).send({ message: 'Invalid format' });
+  else next(err);
+};
+
 exports.handle405 = (req, res, next) => {
   res.status(405).send({ message: 'METHOD NOT ALLOWED' });
 };

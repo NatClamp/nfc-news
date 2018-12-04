@@ -8,7 +8,8 @@ router
   .post(addATopic)
   .all(handle405);
 
-router.route('/:topic/articles')
+router
+  .route('/:topic/articles')
   .get(getArticlesWithTopic);
 
 module.exports = router;

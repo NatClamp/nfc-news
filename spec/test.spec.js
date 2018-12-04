@@ -72,6 +72,19 @@ describe('/', () => {
             expect(res.body.message).to.equal('METHOD NOT ALLOWED');
           });
       });
+      it('ERROR - responds with 400 when client enters incorrectly formatted body', () => {
+        const sillyTopic = {
+          hello: 'you',
+          how_are_you: 'very sad',
+        };
+        return request
+          .post('/api/topics')
+          .send(sillyTopic)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('Invalid format');
+          });
+      });
       describe('/:topics/articles', () => {
         it('GET - responds with 200 and an array of article objects for the chosen topic with default values for limit, sort_by and order', () => request.get('/api/topics/mitch/articles')
           .expect(200)
