@@ -7,7 +7,7 @@ const app = require('../app');
 const request = supertest(app);
 const connection = require('../db/connection');
 
-describe('/', () => {
+describe('/*', () => {
   beforeEach(() => connection.migrate.rollback()
     .then(() => connection.migrate.latest())
     .then(() => connection.seed.run()));
@@ -101,6 +101,11 @@ describe('/', () => {
           .then((res) => {
             expect(res.body.message).to.equal('Page not found');
           }));
+        it('ERROR - responds with 405 and message if client tries to use inaccessible method', () => request.patch('/api/topics/mitch/articles')
+          .expect(405)
+          .then((res) => {
+            expect(res.body.message).to.equal('METHOD NOT ALLOWED');
+          }));
         it('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/topics/mitch/articles?limit=3')
           .expect(200)
           .then((res) => {
@@ -120,6 +125,11 @@ describe('/', () => {
           .expect(200)
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(1);
+          }));
+        it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/topics/mitch/articles?sort_by=jdhaffb')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('Invalid format');
           }));
       });
     });

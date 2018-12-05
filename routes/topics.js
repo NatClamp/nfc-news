@@ -10,6 +10,7 @@ router
 
 router
   .route('/:topic/articles')
-  .get(getArticlesWithTopic);
+  .get(getArticlesWithTopic)
+  .all(handle405);
 
 module.exports = router;
