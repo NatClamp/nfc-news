@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { handle405 } = require('../errors/index');
-const { getAllArticles, getArticleByArticleId } = require('../controllers/articles');
+const { getAllArticles, getArticleByArticleId, updateVote } = require('../controllers/articles');
 
 router.param('article_id', (req, res, next, article_id) => {
   if (Number.isInteger(+article_id)) next();
@@ -14,6 +14,7 @@ router
 
 router
   .route('/:article_id')
-  .get(getArticleByArticleId);
+  .get(getArticleByArticleId)
+  .patch(updateVote);
 
 module.exports = router;

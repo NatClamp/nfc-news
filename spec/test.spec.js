@@ -173,7 +173,7 @@ describe('/*', () => {
         });
       });
     });
-    describe.only('/articles', () => {
+    describe('/articles', () => {
       it('GET - responds with status 200 and an array of article objects with default values for limit, sort_by and order', () => request.get('/api/articles')
         .expect(200)
         .then((res) => {
@@ -222,7 +222,35 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.message).to.equal('Page not found');
           }));
+        it('PATCH - responds with 200 and upates the value on the votes key with a positive number', () => {
+          const vote = { inc_votes: 5 };
+          return request.patch('/api/articles/3')
+            .send(vote)
+            .expect(200)
+            .then((res) => {
+              expect(res.body.article[0].votes).to.equal(5);
+            });
+        });
+        it('PATCH - responds with 200 and upates the value on the votes key with a negative number', () => {
+          const vote = { inc_votes: -5 };
+          return request.patch('/api/articles/3')
+            .send(vote)
+            .expect(200)
+            .then((res) => {
+              expect(res.body.article[0].votes).to.equal(-5);
+            });
+        });
+        it('ERROR - responds with status 400 if client tries to update votes with an incorrect data type', () => {
+          const vote = { inc_votes: 'KUDOS' };
+          return request.patch('/api/articles/3')
+            .send(vote)
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('invalid input syntax for integer');
+            });
+        });
       });
+
       // end of articles/:article_id describe block
     });
     // end of /articles describe block

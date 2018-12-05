@@ -91,3 +91,20 @@ exports.getArticleByArticleId = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.updateVote = (req, res, next) => {
+  if (typeof req.body.inc_votes === 'string') return next({ code: '22P02' });
+
+  const { inc_votes } = req.body;
+  const { article_id } = req.params;
+  return connection('articles')
+    .select('*')
+    .where('article_id', article_id)
+    .modify((articleQuery) => {
+      if (inc_votes > 0) articleQuery.increment('votes', inc_votes);
+      else articleQuery.decrement('votes', Math.abs(inc_votes));
+    })
+    .returning('*')
+    .then(article => res.status(200).send({ article }))
+    .catch(next);
+};
