@@ -272,12 +272,19 @@ describe('/*', () => {
             .expect(200)
             .then((res) => {
               expect(res.body.comments).to.have.length(10);
+              expect(res.body.comments[0].comment_id).to.equal(2);
             }));
-          it('ERROR - returns 404 if client enters an article number that does not have any comments', () => request
+          it('ERROR - returns 404 if client enters an article number for an existing article that does not have any comments', () => request
             .get('/api/articles/8/comments')
             .expect(404)
             .then((res) => {
               expect(res.body.message).to.equal('Page not found');
+            }));
+          it('ERROR - returns 400 if client enters an invalid article_id', () => request
+            .get('/api/articles/error/comments')
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('invalid input syntax for integer');
             }));
           it('GET - returns status 200 and applies limit query if client provides one', () => request.get('/api/articles/1/comments?limit=2')
             .expect(200)
@@ -289,6 +296,17 @@ describe('/*', () => {
             .then((res) => {
               expect(res.body.comments[0].author).to.eql('icellusedkars');
               expect(res.body.comments[2].comment_id).to.eql(2);
+            }));
+          it('GET - returns status 200 and applies page query if client provides one', () => request.get('/api/articles/1/comments?p=2&limit=2')
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comments[0].comment_id).to.eql(4);
+              expect(res.body.comments).to.have.length(2);
+            }));
+          it('GET - returns status 200 and applies ordering if client provides one', () => request.get('/api/articles/1/comments?sort_by=comment_id&sort_ascending=true')
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comments[0].comment_id).to.eql(2);
             }));
         });
       });
