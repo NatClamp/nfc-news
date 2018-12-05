@@ -249,6 +249,23 @@ describe('/*', () => {
               expect(res.body.message).to.equal('invalid input syntax for integer');
             });
         });
+        it('DELETE - returns status 200 and returns and empty object', () => request
+          .delete('/api/articles/1')
+          .expect(200)
+          .then((res) => {
+            expect(res.body).to.eql({});
+          })
+          .then(() => request
+            .get('/api/articles/1')
+            .expect(404))
+          .then((res) => {
+            expect(res.body.message).to.equal('Page not found');
+          }));
+        it('ERROR - responds with a 404 if client tries to delete an article that does not exist', () => request.delete('/api/articles/58371')
+          .expect(404)
+          .then((res) => {
+            expect(res.body.message).to.equal('Page not found');
+          }));
       });
 
       // end of articles/:article_id describe block

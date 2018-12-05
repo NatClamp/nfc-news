@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const { handle405 } = require('../errors/index');
-const { getAllArticles, getArticleByArticleId, updateVote } = require('../controllers/articles');
+const {
+  getAllArticles, getArticleByArticleId, updateVote, deleteArticle,
+} = require('../controllers/articles');
+const { getAllComments } = require('../controllers/comments');
 
 router.param('article_id', (req, res, next, article_id) => {
   if (Number.isInteger(+article_id)) next();
@@ -15,6 +18,11 @@ router
 router
   .route('/:article_id')
   .get(getArticleByArticleId)
-  .patch(updateVote);
+  .patch(updateVote)
+  .delete(deleteArticle);
+
+router
+  .route('/:article_id/comments')
+  .get(getAllComments);
 
 module.exports = router;

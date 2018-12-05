@@ -108,3 +108,17 @@ exports.updateVote = (req, res, next) => {
     .then(article => res.status(200).send({ article }))
     .catch(next);
 };
+
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  return connection('articles')
+    .select('*')
+    .where('article_id', article_id)
+    .del()
+    .returning('*')
+    .then((article) => {
+      if (article.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      return res.status(200).send({});
+    })
+    .catch(next);
+};
