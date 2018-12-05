@@ -206,6 +206,25 @@ describe('/*', () => {
         .then((res) => {
           expect(res.body.message).to.equal('Invalid format');
         }));
+      describe('/:article_id', () => {
+        it('GET - responds with 200 and an article object', () => request.get('/api/articles/4')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.article[0].article_id).to.equal(4);
+          }));
+        it('ERROR - responds with 400 if client enters article_id of wrong data type', () => request.get('/api/articles/hydrangea')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('invalid input syntax for integer');
+          }));
+        it('ERROR - responds with 404 if client enters article_id that does not exist', () => request.get('/api/articles/967')
+          .expect(404)
+          .then((res) => {
+            expect(res.body.message).to.equal('Page not found');
+          }));
+      });
+      // end of articles/:article_id describe block
     });
+    // end of /articles describe block
   });
 });
