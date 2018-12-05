@@ -271,13 +271,24 @@ describe('/*', () => {
             .get('/api/articles/1/comments')
             .expect(200)
             .then((res) => {
-              expect(res.body.comments).to.have.length(13);
+              expect(res.body.comments).to.have.length(10);
             }));
           it('ERROR - returns 404 if client enters an article number that does not have any comments', () => request
             .get('/api/articles/8/comments')
             .expect(404)
             .then((res) => {
               expect(res.body.message).to.equal('Page not found');
+            }));
+          it('GET - returns status 200 and applies limit query if client provides one', () => request.get('/api/articles/1/comments?limit=2')
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comments).to.have.length(2);
+            }));
+          it('GET - returns status 200 and applies sort_by query if client provides one', () => request.get('/api/articles/1/comments?sort_by=votes')
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comments[0].author).to.eql('icellusedkars');
+              expect(res.body.comments[2].comment_id).to.eql(2);
             }));
         });
       });
