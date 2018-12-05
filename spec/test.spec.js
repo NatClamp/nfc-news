@@ -173,11 +173,38 @@ describe('/*', () => {
         });
       });
     });
-    describe('/articles', () => {
-      it.skip('GET - responds with status 200 and an array of article objects', () => request.get('/api/articles')
+    describe.only('/articles', () => {
+      it('GET - responds with status 200 and an array of article objects with default values for limit, sort_by and order', () => request.get('/api/articles')
         .expect(200)
         .then((res) => {
-          expect(res.body.articles[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'created_by', 'created_at']);
+          expect(res.body.articles[0]).to.have.all.keys(['article_id', 'title', 'votes', 'topic', 'author', 'created_at', 'comment_count']);
+          expect(res.body.articles).to.have.length(10);
+          expect(res.body.articles[0].article_id).to.equal(1);
+        }));
+      it('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/articles?limit=3')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).to.have.length(3);
+        }));
+      it('GET - responds with 200 and an array of article objects, sort applied by client in query', () => request.get('/api/articles?sort_by=article_id')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].article_id).to.equal(12);
+        }));
+      it('GET - responds with 200 and an array of article objects, starting at page specified in query', () => request.get('/api/articles?p=2&limit=2')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].article_id).to.equal(3);
+        }));
+      it('GET - responds with 200 and an array of article objects, sorted to ascending if specified in query', () => request.get('/api/articles?sort_ascending=true')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].article_id).to.equal(1);
+        }));
+      it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/articles?sort_by=jdhaffb')
+        .expect(400)
+        .then((res) => {
+          expect(res.body.message).to.equal('Invalid format');
         }));
     });
   });
