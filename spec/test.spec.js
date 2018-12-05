@@ -131,7 +131,29 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.message).to.equal('Invalid format');
           }));
+        it('POST - responds with 201 and the posted article', () => {
+          const newArticle = {
+            title: 'toot toot',
+            user_id: 2,
+            body: 'Every day coding is like experience an entire life in 24 hours',
+          };
+          return request.post('/api/topics/mitch/articles')
+            .send(newArticle)
+            .expect(201)
+            .then((res) => {
+              expect(res.body.article).to.have.length(1);
+              expect(res.body.article[0].title).to.equal('toot toot');
+              expect(res.body.article[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'created_by', 'created_at']);
+            });
+        });
       });
+    });
+    describe('/articles', () => {
+      it('GET - responds with status 200 and an array of article objects', () => request.get('/api/articles')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'created_by', 'created_at']);
+        }));
     });
   });
 });
