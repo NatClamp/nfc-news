@@ -37,8 +37,11 @@ exports.addArticlesWithTopic = (req, res, next) => {
   return connection('articles')
     .insert(objToAdd)
     .returning('*')
-    .then(article => res.status(201).send({ article }));
+    .then((article) => {
+      if (Object.keys(article[0]).length !== 7) return Promise.reject({ status: 400, message: 'missing value violates not-null constraint' });
+      return res.status(201).send({ article });
+    })
+    .catch(next);
 };
 
-exports.getAllArticles = (req, res, next) => {}
-;
+exports.getAllArticles = (req, res, next) => {};

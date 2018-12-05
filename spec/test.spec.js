@@ -146,10 +146,35 @@ describe('/*', () => {
               expect(res.body.article[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'created_by', 'created_at']);
             });
         });
+        it('ERROR - responds with 422 if the client provides a user_id that doesn\'t exist', () => {
+          const newArticle = {
+            title: 'toot toot',
+            user_id: 799,
+            body: 'Every day coding is like experience an entire life in 24 hours',
+          };
+          return request.post('/api/topics/mitch/articles')
+            .send(newArticle)
+            .expect(422)
+            .then((res) => {
+              expect(res.body.message).to.equal('Must enter valid value');
+            });
+        });
+        it('ERROR - responds with 400 if the client provides malformed syntax e.g. a missing key', () => {
+          const newArticle = {
+            user_id: 2,
+            body: 'Every day coding is like experience an entire life in 24 hours',
+          };
+          return request.post('/api/topics/mitch/articles')
+            .send(newArticle)
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('missing value violates not-null constraint');
+            });
+        });
       });
     });
     describe('/articles', () => {
-      it('GET - responds with status 200 and an array of article objects', () => request.get('/api/articles')
+      it.skip('GET - responds with status 200 and an array of article objects', () => request.get('/api/articles')
         .expect(200)
         .then((res) => {
           expect(res.body.articles[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'created_by', 'created_at']);

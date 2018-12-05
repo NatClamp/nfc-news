@@ -7,12 +7,20 @@ exports.handle404 = (err, req, res, next) => {
 };
 
 exports.handle422 = (err, req, res, next) => {
-  if (err.code === '23505') res.status(422).send({ message: 'This key already exists' });
+  const codes = {
+    23503: 'Must enter valid value',
+    23505: 'This key already exists',
+  };
+  if (codes[err.code]) res.status(422).send({ message: codes[err.code] });
   else next(err);
 };
 
 exports.handle400 = (err, req, res, next) => {
-  if (err.code === '42703') res.status(400).send({ message: 'Invalid format' });
+  const codes = {
+    42703: 'Invalid format',
+    23502: 'missing value violates not-null constraint',
+  };
+  if (codes[err.code]) res.status(400).send({ message: codes[err.code] });
   else next(err);
 };
 
