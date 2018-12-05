@@ -266,6 +266,20 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.message).to.equal('Page not found');
           }));
+        describe.only('/comments', () => {
+          it('GET - returns status 200 and an array of comments with default queries', () => request
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comments).to.have.length(13);
+            }));
+          it('ERROR - returns 404 if client enters an article number that does not have any comments', () => request
+            .get('/api/articles/8/comments')
+            .expect(404)
+            .then((res) => {
+              expect(res.body.message).to.equal('Page not found');
+            }));
+        });
       });
 
       // end of articles/:article_id describe block
@@ -273,3 +287,6 @@ describe('/*', () => {
     // end of /articles describe block
   });
 });
+
+// non existent id - 422
+// syntax wrong - 400
