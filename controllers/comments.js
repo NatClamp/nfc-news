@@ -32,3 +32,37 @@ exports.addComment = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.updateCommentVote = (req, res, next) => {
+  const { article_id, comment_id } = req.params;
+  const { inc_votes } = req.body;
+  if (typeof inc_votes === 'string') return next({ code: '22P02' });
+  return connection('comments')
+    .select('*')
+    .where('article_id', article_id)
+    .where('comment_id', comment_id)
+    .modify((comQuery) => {
+      if (inc_votes > 0) comQuery.increment('votes', inc_votes);
+      else comQuery.decrement('votes', Math.abs(inc_votes));
+    })
+    .returning('*')
+    .then((comment) => {
+      res.status(200).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.deleteComment = (req, res, next) => {
+  const { article_id, comment_id } = req.params;
+  return connection('comments')
+    .select('*')
+    .where('article_id', article_id)
+    .where('comment_id', comment_id)
+    .del()
+    .returning('*')
+    .then((comment) => {
+      if (comment.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      return res.status(204).send({});
+    })
+    .catch(next);
+};

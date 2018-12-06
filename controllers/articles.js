@@ -90,9 +90,8 @@ exports.getArticleByArticleId = (req, res, next) => {
     .catch(next);
 };
 
-exports.updateVote = (req, res, next) => {
+exports.updateArticleVote = (req, res, next) => {
   if (typeof req.body.inc_votes === 'string') return next({ code: '22P02' });
-
   const { inc_votes } = req.body;
   const { article_id } = req.params;
   return connection('articles')
@@ -116,7 +115,7 @@ exports.deleteArticle = (req, res, next) => {
     .returning('*')
     .then((article) => {
       if (article.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
-      return res.status(200).send({});
+      return res.status(204).send({});
     })
     .catch(next);
 };

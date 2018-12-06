@@ -23,6 +23,12 @@ describe('/*', () => {
       .then((res) => {
         expect(res.body.message).to.eql('Page not found');
       }));
+    it.only('GET - responds with 200 and serves a JSON describing all the available endpoints on the API', () => request
+      .get('/api')
+      .expect(200)
+      .then((res) => {
+        expect(Object.keys(res.body.endpoints)).to.have.length(9);
+      }));
     describe('/topics', () => {
       it('GET - responds with status 200 and an array of topic objects', () => request
         .get('/api/topics')
@@ -249,9 +255,9 @@ describe('/*', () => {
               expect(res.body.message).to.equal('invalid input syntax for integer');
             });
         });
-        it('DELETE - returns status 200 and returns and empty object', () => request
+        it('DELETE - returns status 204 and returns and empty object', () => request
           .delete('/api/articles/1')
-          .expect(200)
+          .expect(204)
           .then((res) => {
             expect(res.body).to.eql({});
           })
@@ -344,12 +350,78 @@ describe('/*', () => {
                 expect(res.body.message).to.equal('violates foreign key constraint');
               });
           });
+          describe('/:comment_id', () => {
+            it('PATCH - responds with 200 and updates the votes on a comment with a positive number', () => {
+              const newVote = { inc_votes: 5 };
+              return request
+                .patch('/api/articles/1/comments/2')
+                .send(newVote)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body.comment).to.have.length(1);
+                  expect(res.body.comment[0].votes).to.equal(19);
+                });
+            });
+            it('PATCH - responds with 200 and updates the votes on a comment with a negative number', () => {
+              const newVote = { inc_votes: -5 };
+              return request
+                .patch('/api/articles/1/comments/2')
+                .send(newVote)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body.comment).to.have.length(1);
+                  expect(res.body.comment[0].votes).to.equal(9);
+                });
+            });
+            it('ERROR - PATCH - reponds with 400 if client tries to update vote with an incorrect data type', () => {
+              const newVote = { inc_votes: 'i like this one' };
+              return request
+                .patch('/api/articles/1/comments/2')
+                .send(newVote)
+                .expect(400)
+                .then((res) => {
+                  expect(res.body.message).to.equal('invalid input syntax for integer');
+                });
+            });
+            it('DELETE - returns status 204 and returns and empty object', () => request
+              .delete('/api/articles/1/comments/2')
+              .expect(204)
+              .then((res) => {
+                expect(res.body).to.eql({});
+              })
+              .then(() => request
+                .get('/api/articles/1/comments/2')
+                .expect(404))
+              .then((res) => {
+                expect(res.body.message).to.equal('Page not found');
+              }));
+            it('ERROR - DELETE - responds with a 404 if client tries to delete an comment that does not exist', () => request.delete('/api/articles/1/comments/235')
+              .expect(404)
+              .then((res) => {
+                expect(res.body.message).to.equal('Page not found');
+              }));
+          });
         });
       });
-
-      // end of articles/:article_id describe block
     });
-    // end of /articles describe block
+    describe('/users', () => {
+      it('GET - returns 200 and an array of user objects', () => request
+        .get('/api/users')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.users).to.have.length(3);
+          expect(res.body.users[0].name).to.equal('jonny');
+          expect(res.body.users[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
+        }));
+      describe('/:user_id', () => {
+        it('GET - responds with 200 and a user object', () => request.get('/api/users/1')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.user).to.have.length(1);
+            expect(res.body.user[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
+          }));
+      });
+    });
   });
 });
 
