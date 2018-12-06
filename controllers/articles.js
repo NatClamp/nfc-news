@@ -11,7 +11,7 @@ exports.getArticlesWithTopic = (req, res, next) => {
     .offset((p - 1) * limit)
     .orderBy(sort_by, 'desc')
     .where('topic', topic)
-    .join('users', 'created_by', '=', 'users.user_id')
+    .join('users', 'articles.user_id', '=', 'users.user_id')
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .count('comments.article_id AS comment_count')
     .groupBy('articles.article_id', 'users.username')
@@ -28,12 +28,11 @@ exports.getArticlesWithTopic = (req, res, next) => {
 exports.addArticlesWithTopic = (req, res, next) => {
   if (!req.body.title || !req.body.user_id || !req.body.body) return next({ status: 400, code: 23502, message: 'missing value violates not-null constraint' });
   const copy = { ...req.body, ...req.params };
-  copy.created_by = copy.user_id;
   const {
-    title, created_by, body, topic,
+    title, user_id, body, topic,
   } = copy;
   const objToAdd = {
-    title, created_by, body, topic,
+    title, user_id, body, topic,
   };
   return connection('articles')
     .insert(objToAdd)
@@ -51,7 +50,7 @@ exports.getAllArticles = (req, res, next) => {
     .limit(limit)
     .offset((p - 1) * limit)
     .orderBy(sort_by, 'desc')
-    .join('users', 'created_by', '=', 'users.user_id')
+    .join('users', 'articles.user_id', '=', 'users.user_id')
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .count('comments.article_id AS comment_count')
     .groupBy('articles.article_id', 'users.username')
@@ -75,7 +74,7 @@ exports.getArticleByArticleId = (req, res, next) => {
     .limit(limit)
     .offset((p - 1) * limit)
     .orderBy(sort_by, 'desc')
-    .join('users', 'created_by', '=', 'users.user_id')
+    .join('users', 'articles.user_id', '=', 'users.user_id')
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .count('comments.article_id AS comment_count')
     .groupBy('articles.article_id', 'users.username')

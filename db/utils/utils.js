@@ -11,12 +11,12 @@ exports.formatArticles = (data, userLookup) => {
   const formattedArticles = data.map((article) => {
     const cloneArticle = { ...article };
     cloneArticle.created_at = new Date(article.created_at);
-    cloneArticle.created_by = userLookup[article.created_by];
+    cloneArticle.user_id = userLookup[article.created_by];
     const {
-      title, topic, created_by, body, created_at, votes,
+      title, topic, user_id, body, created_at, votes,
     } = cloneArticle;
     return {
-      title, topic, created_by, body, created_at, votes,
+      title, topic, user_id, body, created_at, votes,
     };
   });
   return formattedArticles;

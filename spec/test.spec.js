@@ -7,6 +7,8 @@ const app = require('../app');
 const request = supertest(app);
 const connection = require('../db/connection');
 
+// TEST QUERIES!! ESPECIALLY ON ARTICLES SORTING
+
 describe('/*', () => {
   beforeEach(() => connection.migrate.rollback()
     .then(() => connection.migrate.latest())
@@ -149,7 +151,7 @@ describe('/*', () => {
             .then((res) => {
               expect(res.body.article).to.have.length(1);
               expect(res.body.article[0].title).to.equal('toot toot');
-              expect(res.body.article[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'created_by', 'created_at']);
+              expect(res.body.article[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'user_id', 'created_at']);
             });
         });
         it('ERROR - responds with 422 if the client provides a user_id that doesn\'t exist', () => {
