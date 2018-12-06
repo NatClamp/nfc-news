@@ -259,7 +259,7 @@ describe('/*', () => {
         it('GET - responds with 200 and an article object', () => request.get('/api/articles/4')
           .expect(200)
           .then((res) => {
-            expect(res.body.article[0].article_id).to.equal(4);
+            expect(res.body.articles[0].article_id).to.equal(4);
           }));
         it('ERROR - responds with 400 if client enters article_id of wrong data type', () => request.get('/api/articles/hydrangea')
           .expect(400)
@@ -466,8 +466,8 @@ describe('/*', () => {
         it('GET - responds with 200 and a user object', () => request.get('/api/users/1')
           .expect(200)
           .then((res) => {
-            expect(res.body.user).to.have.length(1);
-            expect(res.body.user[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
+            expect(res.body.users).to.have.length(1);
+            expect(res.body.users[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
           }));
         it('ERROR - responds with 404 if the client enters a user_id that doesn\'t exist', () => request.get('/api/users/54')
           .expect(404)
