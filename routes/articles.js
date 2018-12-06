@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { handle405 } = require('../errors/index');
 const {
-  getAllArticles, getArticleByArticleId, updateArticleVote, deleteArticle,
+  updateArticleVote, deleteArticle, getArticlesController,
 } = require('../controllers/articles');
 const {
   getAllComments, addComment, updateCommentVote, deleteComment,
@@ -19,12 +19,12 @@ router.param('comment_id', (req, res, next, comment_id) => {
 
 router
   .route('/')
-  .get(getAllArticles)
+  .get(getArticlesController)
   .all(handle405);
 
 router
   .route('/:article_id')
-  .get(getArticleByArticleId)
+  .get(getArticlesController)
   .patch(updateArticleVote)
   .delete(deleteArticle)
   .all(handle405);

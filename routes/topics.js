@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { getAllTopics, addATopic } = require('../controllers/topics');
-const { getArticlesWithTopic, addArticlesWithTopic } = require('../controllers/articles');
+const { addArticlesWithTopic, getArticlesController } = require('../controllers/articles');
 const { handle405 } = require('../errors/index');
 
 router
@@ -11,7 +11,7 @@ router
 
 router
   .route('/:topic/articles')
-  .get(getArticlesWithTopic)
+  .get(getArticlesController)
   .post(addArticlesWithTopic)
   .all(handle405);
 

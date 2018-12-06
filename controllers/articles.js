@@ -1,15 +1,7 @@
 const connection = require('../db/connection');
 const { getArticles } = require('../models/articles');
 
-exports.getArticlesWithTopic = (req, res, next) => {
-  getArticles(req, res, next);
-};
-
-exports.getAllArticles = (req, res, next) => {
-  getArticles(req, res, next);
-};
-
-exports.getArticleByArticleId = (req, res, next) => {
+exports.getArticlesController = (req, res, next) => {
   getArticles(req, res, next);
 };
 
