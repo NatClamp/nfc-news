@@ -23,7 +23,7 @@ describe('/*', () => {
       .then((res) => {
         expect(res.body.message).to.eql('Page not found');
       }));
-    it.only('GET - responds with 200 and serves a JSON describing all the available endpoints on the API', () => request
+    it('GET - responds with 200 and serves a JSON describing all the available endpoints on the API', () => request
       .get('/api')
       .expect(200)
       .then((res) => {
