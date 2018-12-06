@@ -9,6 +9,7 @@ router
 
 router
   .route('/:user_id')
-  .get(getSingleUser);
+  .get(getSingleUser)
+  .all(handle405);
 
 module.exports = router;

@@ -13,7 +13,8 @@ exports.getSingleUser = (req, res, next) => {
     .select('*')
     .where('user_id', user_id)
     .then((user) => {
-      res.status(200).send({ user });
+      if (user.length === 0) return next({ status: 404, message: 'Page not found' });
+      return res.status(200).send({ user });
     })
     .catch(next);
 };

@@ -160,16 +160,16 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.message).to.equal('Invalid format');
           }));
-        it.skip('ERROR - responds with 400 if the client enters an incorrect syntax for a query', () => request.get('/api/topics/mitch/articles?soWOOrt_by=article_id')
-          .expect(400)
+        it('Ignores any queries that are incorrectly entered', () => request.get('/api/topics/mitch/articles?soWOOrt_by=article_id')
+          .expect(200)
           .then((res) => {
-            expect(res.body.message).to.equal('Invalid format');
+            expect(res.body.articles[0].topic).to.eql('mitch');
           }));
         it('POST - responds with 201 and the posted article', () => {
           const newArticle = {
             title: 'toot toot',
             user_id: 2,
-            body: 'Every day coding is like experiencing an entire life in 24 hours',
+            body: 'I like plants, do you?',
           };
           return request.post('/api/topics/mitch/articles')
             .send(newArticle)
@@ -416,7 +416,7 @@ describe('/*', () => {
                   expect(res.body.comment[0].votes).to.equal(9);
                 });
             });
-            it('ERROR - PATCH - reponds with 400 if client tries to update vote with an incorrect data type', () => {
+            it('ERROR - reponds with 400 if client tries to update vote with an incorrect data type', () => {
               const newVote = { inc_votes: 'i like this one' };
               return request
                 .patch('/api/articles/1/comments/2')
@@ -438,7 +438,7 @@ describe('/*', () => {
               .then((res) => {
                 expect(res.body.message).to.equal('Page not found');
               }));
-            it('ERROR - DELETE - responds with a 404 if client tries to delete an comment that does not exist', () => request.delete('/api/articles/1/comments/235')
+            it('ERROR - responds with a 404 if client tries to delete an comment that does not exist', () => request.delete('/api/articles/1/comments/235')
               .expect(404)
               .then((res) => {
                 expect(res.body.message).to.equal('Page not found');
@@ -456,12 +456,34 @@ describe('/*', () => {
           expect(res.body.users[0].name).to.equal('jonny');
           expect(res.body.users[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
         }));
+      it('ERROR - responds with 405 if client uses a method not specified', () => request
+        .delete('/api/users')
+        .expect(405)
+        .then((res) => {
+          expect(res.body.message).to.equal('METHOD NOT ALLOWED');
+        }));
       describe('/:user_id', () => {
         it('GET - responds with 200 and a user object', () => request.get('/api/users/1')
           .expect(200)
           .then((res) => {
             expect(res.body.user).to.have.length(1);
             expect(res.body.user[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
+          }));
+        it('ERROR - responds with 404 if the client enters a user_id that doesn\'t exist', () => request.get('/api/users/54')
+          .expect(404)
+          .then((res) => {
+            expect(res.body.message).to.equal('Page not found');
+          }));
+        it('ERROR - responds with 400 if the client enters a user_id in the incorrect syntax', () => request.get('/api/users/butter_bridge')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('invalid input syntax for integer');
+          }));
+        it('ERROR - responds with 405 if client uses a method not specified', () => request
+          .delete('/api/users/1')
+          .expect(405)
+          .then((res) => {
+            expect(res.body.message).to.equal('METHOD NOT ALLOWED');
           }));
       });
     });
