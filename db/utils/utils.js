@@ -1,11 +1,7 @@
-exports.userLookup = (users) => {
-  // should refactor this to use reduce
-  const userLookup = {};
-  users.forEach((user) => {
-    userLookup[user.username] = user.user_id;
-  });
-  return userLookup;
-};
+exports.userLookup = users => users.reduce((accUserObj, currUser) => {
+  accUserObj[currUser.username] = currUser.user_id;
+  return accUserObj;
+}, {});
 
 exports.formatArticles = (data, userLookup) => {
   const formattedArticles = data.map((article) => {
@@ -22,13 +18,10 @@ exports.formatArticles = (data, userLookup) => {
   return formattedArticles;
 };
 
-exports.articleLookup = (articles) => {
-  const articleLookup = {};
-  articles.forEach((article) => {
-    articleLookup[article.title] = article.article_id;
-  });
-  return articleLookup;
-};
+exports.articleLookup = articles => articles.reduce((accArticleObj, currArticle) => {
+  accArticleObj[currArticle.title] = currArticle.article_id;
+  return accArticleObj;
+}, {});
 
 exports.formatComments = (data, articleLookup, userLookup) => {
   const formattedComments = data.map((comment) => {

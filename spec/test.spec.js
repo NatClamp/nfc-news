@@ -7,8 +7,6 @@ const app = require('../app');
 const request = supertest(app);
 const connection = require('../db/connection');
 
-// TEST QUERIES!! ESPECIALLY ON ARTICLES SORTING
-
 describe('/*', () => {
   beforeEach(() => connection.migrate.rollback()
     .then(() => connection.migrate.latest())
@@ -134,6 +132,12 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(12);
           }));
+        it('GET - responds with 200 and an array of article objects with a combination of queries', () => request.get('/api/topics/mitch/articles?limit=2&sort_ascending=true&p=3')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles[0].article_id).to.equal(8);
+            expect(res.body.articles).to.have.length(2);
+          }));
         it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/topics/mitch/articles?sort_by=jdhaffb')
           .expect(400)
           .then((res) => {
@@ -208,6 +212,11 @@ describe('/*', () => {
         .expect(200)
         .then((res) => {
           expect(res.body.articles[0].article_id).to.equal(12);
+        }));
+      it('GET - responds with 200 and an array of article objects with a variety of queries added', () => request.get('/api/articles?limit=2&p=3&sort_ascending=true')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles[0].article_id).to.equal(8);
         }));
       it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/articles?sort_by=jdhaffb')
         .expect(400)
