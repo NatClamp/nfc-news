@@ -2,6 +2,7 @@ const connection = require('../db/connection');
 
 exports.getArticlesWithTopic = (req, res, next) => {
   const { topic } = (req.params);
+  if (Number.isInteger(+topic)) return next({ code: 42703 });
   const {
     limit = 10, sort_by = 'created_at', p = 1, sort_ascending,
   } = req.query;

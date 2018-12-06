@@ -78,9 +78,10 @@ describe('/*', () => {
             expect(res.body.message).to.equal('METHOD NOT ALLOWED');
           });
       });
-      it('ERROR - responds with 400 when client enters incorrectly formatted body', () => {
+      it('ERROR - responds with 400 when client enters body with unnecessary keys', () => {
         const sillyTopic = {
-          hello: 'you',
+          description: 'bunny',
+          slug: 'rabbits',
           how_are_you: 'very sad',
         };
         return request
@@ -89,6 +90,16 @@ describe('/*', () => {
           .expect(400)
           .then((res) => {
             expect(res.body.message).to.equal('Invalid format');
+          });
+      });
+      it('ERROR - responds with 400 if client enters a body without the necessary keys', () => {
+        const missingKey = { slug: 'hey there' };
+        return request
+          .post('/api/topics')
+          .send(missingKey)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('missing value violates not-null constraint');
           });
       });
       describe('/:topics/articles', () => {
@@ -101,11 +112,17 @@ describe('/*', () => {
             expect(res.body.articles).to.have.length(10);
             expect(res.body.articles[0].article_id).to.equal(1);
           }));
-        it('ERROR - responds with status 404 if client enters topic that does not exist', () => request
+        it('ERROR - responds with status 404 if client enters topic that does not exist but in correct syntax', () => request
           .get('/api/topics/puppies/articles')
           .expect(404)
           .then((res) => {
             expect(res.body.message).to.equal('Page not found');
+          }));
+        it('ERROR - responds with status 400 if client enters topic using incorrect syntax', () => request
+          .get('/api/topics/1/articles')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('Invalid format');
           }));
         it('ERROR - responds with 405 and message if client tries to use inaccessible method', () => request.patch('/api/topics/mitch/articles')
           .expect(405)
@@ -138,7 +155,12 @@ describe('/*', () => {
             expect(res.body.articles[0].article_id).to.equal(8);
             expect(res.body.articles).to.have.length(2);
           }));
-        it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/topics/mitch/articles?sort_by=jdhaffb')
+        it('ERROR - responds with 400 if the client enters a value for query with incorrect syntax', () => request.get('/api/topics/mitch/articles?sort_by=jdhaffb')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('Invalid format');
+          }));
+        it.skip('ERROR - responds with 400 if the client enters an incorrect syntax for a query', () => request.get('/api/topics/mitch/articles?soWOOrt_by=article_id')
           .expect(400)
           .then((res) => {
             expect(res.body.message).to.equal('Invalid format');
@@ -181,6 +203,16 @@ describe('/*', () => {
             .expect(400)
             .then((res) => {
               expect(res.body.message).to.equal('missing value violates not-null constraint');
+            });
+        });
+        it('ERROR - responds with 405 if client uses a method that is not specified', () => {
+          const deleteArticle = { title: 'Living in the shadow of a great man', user_id: 1, body: 'I find this existence challenging' };
+          return request
+            .delete('/api/topics/mitch/articles')
+            .send(deleteArticle)
+            .expect(405)
+            .then((res) => {
+              expect(res.body.message).to.equal('METHOD NOT ALLOWED');
             });
         });
       });
@@ -297,7 +329,7 @@ describe('/*', () => {
             .then((res) => {
               expect(res.body.message).to.equal('Page not found');
             }));
-          it('ERROR - returns 400 if client enters an invalid article_id', () => request
+          it('ERROR - returns 400 if client enters an article_id with incorrect syntax', () => request
             .get('/api/articles/error/comments')
             .expect(400)
             .then((res) => {
@@ -325,7 +357,7 @@ describe('/*', () => {
             .then((res) => {
               expect(res.body.comments[0].comment_id).to.eql(2);
             }));
-          it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/articles/1/comments?sort_by=jdhaffb')
+          it('ERROR - responds with 400 if the client incorrectly enters a query with invalid syntax', () => request.get('/api/articles/1/comments?sort_by=jdhaffb')
             .expect(400)
             .then((res) => {
               expect(res.body.message).to.equal('Invalid format');
