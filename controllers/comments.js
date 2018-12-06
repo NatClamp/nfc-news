@@ -19,3 +19,16 @@ exports.getAllComments = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.addComment = (req, res, next) => {
+  if (!req.body.body || !req.body.user_id) return next({ status: 400, code: 23502, message: 'missing value violates not-null constraint' });
+  const { article_id } = req.params;
+  const commentToAdd = { ...req.body, article_id };
+  return connection('comments')
+    .insert(commentToAdd)
+    .returning('*')
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
+};

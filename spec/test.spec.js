@@ -156,7 +156,7 @@ describe('/*', () => {
             .send(newArticle)
             .expect(422)
             .then((res) => {
-              expect(res.body.message).to.equal('Must enter valid value');
+              expect(res.body.message).to.equal('violates foreign key constraint');
             });
         });
         it('ERROR - responds with 400 if the client provides malformed syntax e.g. a missing key', () => {
@@ -266,7 +266,7 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.message).to.equal('Page not found');
           }));
-        describe.only('/comments', () => {
+        describe('/comments', () => {
           it('GET - returns status 200 and an array of comments with default queries', () => request
             .get('/api/articles/1/comments')
             .expect(200)
@@ -308,6 +308,42 @@ describe('/*', () => {
             .then((res) => {
               expect(res.body.comments[0].comment_id).to.eql(2);
             }));
+          it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/articles/1/comments?sort_by=jdhaffb')
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('Invalid format');
+            }));
+          it('POST - responds with 201 and the posted object with user_id and body', () => {
+            const newComment = { user_id: 1, body: 'What lovely bunting!' };
+            return request
+              .post('/api/articles/1/comments')
+              .send(newComment)
+              .expect(201)
+              .then((res) => {
+                expect(res.body.comment).to.have.length(1);
+                expect(res.body.comment[0].body).to.eql('What lovely bunting!');
+              });
+          });
+          it('ERROR - responds with 400 if client enters comment with a missing key', () => {
+            const newComment = { user_id: 1 };
+            return request
+              .post('/api/articles/1/comments')
+              .send(newComment)
+              .expect(400)
+              .then((res) => {
+                expect(res.body.message).to.equal('missing value violates not-null constraint');
+              });
+          });
+          it('ERROR - responds with 422 if client enters a user_id that doesn\'t exist', () => {
+            const newComment = { user_id: 987, body: 'Were Shibes doing all these funny things before people started taking photos and posting them online?' };
+            return request
+              .post('/api/articles/1/comments')
+              .send(newComment)
+              .expect(422)
+              .then((res) => {
+                expect(res.body.message).to.equal('violates foreign key constraint');
+              });
+          });
         });
       });
 

@@ -26,6 +26,7 @@ exports.getArticlesWithTopic = (req, res, next) => {
 };
 
 exports.addArticlesWithTopic = (req, res, next) => {
+  if (!req.body.title || !req.body.user_id || !req.body.body) return next({ status: 400, code: 23502, message: 'missing value violates not-null constraint' });
   const copy = { ...req.body, ...req.params };
   copy.created_by = copy.user_id;
   const {
@@ -37,10 +38,7 @@ exports.addArticlesWithTopic = (req, res, next) => {
   return connection('articles')
     .insert(objToAdd)
     .returning('*')
-    .then((article) => {
-      if (Object.keys(article[0]).length !== 7) return Promise.reject({ status: 400, message: 'missing value violates not-null constraint' });
-      return res.status(201).send({ article });
-    })
+    .then(article => res.status(201).send({ article }))
     .catch(next);
 };
 

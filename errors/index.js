@@ -8,7 +8,7 @@ exports.handle404 = (err, req, res, next) => {
 
 exports.handle422 = (err, req, res, next) => {
   const codes = {
-    23503: 'Must enter valid value',
+    23503: 'violates foreign key constraint',
     23505: 'This key already exists',
   };
   if (codes[err.code]) res.status(422).send({ message: codes[err.code] });
