@@ -132,7 +132,7 @@ describe('/*', () => {
         it('GET - responds with 200 and an array of article objects, sorted to ascending if specified in query', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
           .expect(200)
           .then((res) => {
-            expect(res.body.articles[0].article_id).to.equal(1);
+            expect(res.body.articles[0].article_id).to.equal(12);
           }));
         it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/topics/mitch/articles?sort_by=jdhaffb')
           .expect(400)
@@ -143,7 +143,7 @@ describe('/*', () => {
           const newArticle = {
             title: 'toot toot',
             user_id: 2,
-            body: 'Every day coding is like experience an entire life in 24 hours',
+            body: 'Every day coding is like experiencing an entire life in 24 hours',
           };
           return request.post('/api/topics/mitch/articles')
             .send(newArticle)
@@ -207,7 +207,7 @@ describe('/*', () => {
       it('GET - responds with 200 and an array of article objects, sorted to ascending if specified in query', () => request.get('/api/articles?sort_ascending=true')
         .expect(200)
         .then((res) => {
-          expect(res.body.articles[0].article_id).to.equal(1);
+          expect(res.body.articles[0].article_id).to.equal(12);
         }));
       it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/articles?sort_by=jdhaffb')
         .expect(400)
