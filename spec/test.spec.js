@@ -147,7 +147,7 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.articles).to.have.length(3);
           }));
-        it.only('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/topics/mitch/articles?limit=3.0')
+        it('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/topics/mitch/articles?limit=3.0')
           .expect(200)
           .then((res) => {
             expect(res.body.articles).to.have.length(3);
@@ -461,6 +461,16 @@ describe('/*', () => {
               .expect(400)
               .then((res) => {
                 expect(res.body.message).to.equal('missing value violates not-null constraint');
+              });
+          });
+          it('ERROR - responds with 404 if client tries to post a comment to an article that doesn\'t exist', () => {
+            const newComment = { user_id: 1, body: 'What lovely bunting!' };
+            return request
+              .post('/api/articles/100/comments')
+              .send(newComment)
+              .expect(404)
+              .then((res) => {
+                expect(res.body.message).to.equal('Page not found');
               });
           });
           it('ERROR - responds with 422 if client enters a user_id that doesn\'t exist', () => {

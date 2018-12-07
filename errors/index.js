@@ -3,6 +3,7 @@
 exports.handle404 = (err, req, res, next) => {
   console.log(err);
   if (err.status === 404) res.status(404).send({ message: err.message });
+  else if (err.constraint === 'comments_article_id_foreign') res.status(404).send({ message: 'Page not found' });
   else next(err);
 };
 
