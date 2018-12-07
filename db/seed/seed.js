@@ -3,7 +3,7 @@ const {
   userData,
   articleData,
   commentData,
-} = require('../data/test-data');
+} = require('../data');
 const {
   userLookup, formatArticles, articleLookup, formatComments,
 } = require('../utils/utils');

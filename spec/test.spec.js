@@ -18,7 +18,7 @@ describe('/*', () => {
       expect(res.body.message).to.equal('Page not found');
     }));
   describe('/api', () => {
-    it('Error - responds with status 404 if the client enters an endpoint that does not exist within api', () => request.get('/api/nonexistent')
+    it('ERROR - responds with status 404 if the client enters an endpoint that does not exist within api', () => request.get('/api/nonexistent')
       .expect(404)
       .then((res) => {
         expect(res.body.message).to.eql('Page not found');
@@ -102,6 +102,19 @@ describe('/*', () => {
             expect(res.body.message).to.equal('missing value violates not-null constraint');
           });
       });
+      it('ERROR - responds with 400 if client enters body with values in incorrect syntax', () => {
+        const wrongSyntaxTopic = {
+          description: 23,
+          slug: 543,
+        };
+        return request
+          .post('/api/topics')
+          .send(wrongSyntaxTopic)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('Invalid format');
+          });
+      });
       describe('/:topics/articles', () => {
         it('GET - responds with 200 and an array of article objects for the chosen topic with default values for limit, sort_by and order', () => request
           .get('/api/topics/mitch/articles')
@@ -134,15 +147,35 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.articles).to.have.length(3);
           }));
+        it.only('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/topics/mitch/articles?limit=3.0')
+          .expect(200)
+          .then((res) => {
+            expect(res.body.articles).to.have.length(3);
+          }));
+        it('ERROR - responds with 400 if client enters a limit in incorrect syntax', () => request.get('/api/topics/mitch/articles?limit=mitchell')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('invalid input syntax for integer');
+          }));
         it('GET - responds with 200 and an array of article objects, sort applied by client in query', () => request.get('/api/topics/mitch/articles?sort_by=article_id')
           .expect(200)
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(12);
           }));
+        it('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/topics/mitch/articles?sort_by=puppies')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('Invalid format');
+          }));
         it('GET - responds with 200 and an array of article objects, starting at page specified in query', () => request.get('/api/topics/mitch/articles?p=2&limit=2')
           .expect(200)
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(3);
+          }));
+        it('ERROR - responds with 400 if client enters a incorrect syntax for p value', () => request.get('/api/topics/mitch/articles?p=puppies')
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message).to.equal('invalid input syntax for integer');
           }));
         it('GET - responds with 200 and an array of article objects, sorted to ascending if specified in query', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
           .expect(200)
@@ -160,7 +193,7 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.message).to.equal('Invalid format');
           }));
-        it('Ignores any queries that are incorrectly entered', () => request.get('/api/topics/mitch/articles?soWOOrt_by=article_id')
+        it('ERROR - ignores any queries that are incorrectly entered', () => request.get('/api/topics/mitch/articles?soWOOrt_by=article_id')
           .expect(200)
           .then((res) => {
             expect(res.body.articles[0].topic).to.eql('mitch');
@@ -205,6 +238,19 @@ describe('/*', () => {
               expect(res.body.message).to.equal('missing value violates not-null constraint');
             });
         });
+        it('ERROR - responds with 400 if the client provides values in incorrect syntax', () => {
+          const newArticle = {
+            title: 'Living in the shadow of a great man',
+            user_id: 'heelo',
+            body: 'Every day coding is like experience an entire life in 24 hours',
+          };
+          return request.post('/api/topics/mitch/articles')
+            .send(newArticle)
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('invalid input syntax for integer');
+            });
+        });
         it('ERROR - responds with 405 if client uses a method that is not specified', () => {
           const deleteArticle = { title: 'Living in the shadow of a great man', user_id: 1, body: 'I find this existence challenging' };
           return request
@@ -226,6 +272,11 @@ describe('/*', () => {
           expect(res.body.articles[0].article_id).to.equal(1);
         }));
       it('GET - responds with 200 and an array of article objects, with limit applied by client in query', () => request.get('/api/articles?limit=3')
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).to.have.length(3);
+        }));
+      it('GET - applies absolute number as limit if client enters limit less than 0', () => request.get('/api/articles?limit=-3')
         .expect(200)
         .then((res) => {
           expect(res.body.articles).to.have.length(3);
@@ -298,6 +349,15 @@ describe('/*', () => {
               expect(res.body.message).to.equal('invalid input syntax for integer');
             });
         });
+        it('ERROR - responds with status 404 if client tries to update votes on non-existent article_id', () => {
+          const vote = { inc_votes: 4 };
+          return request.patch('/api/articles/9559')
+            .send(vote)
+            .expect(404)
+            .then((res) => {
+              expect(res.body.message).to.equal('Page not found');
+            });
+        });
         it('DELETE - returns status 204 and returns and empty object', () => request
           .delete('/api/articles/1')
           .expect(204)
@@ -323,7 +383,7 @@ describe('/*', () => {
               expect(res.body.comments).to.have.length(10);
               expect(res.body.comments[0].comment_id).to.equal(2);
             }));
-          it('ERROR - returns 404 if client enters an article number for an existing article that does not have any comments', () => request
+          it('ERROR - returns 404 if client enters an article number for an existing article that does not have any comments / a non-existent article_id', () => request
             .get('/api/articles/8/comments')
             .expect(404)
             .then((res) => {
@@ -340,17 +400,37 @@ describe('/*', () => {
             .then((res) => {
               expect(res.body.comments).to.have.length(2);
             }));
+          it('GET - applies absolute number if client enters a limit less than 1', () => request.get('/api/articles/1/comments?limit=-2')
+            .expect(200)
+            .then((res) => {
+              expect(res.body.comments).to.have.length(2);
+            }));
+          it('ERROR - responds with 400 if client enters a limit in incorrect syntax', () => request.get('/api/articles/1/comments?limit=mitch')
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('invalid input syntax for integer');
+            }));
           it('GET - returns status 200 and applies sort_by query if client provides one', () => request.get('/api/articles/1/comments?sort_by=votes')
             .expect(200)
             .then((res) => {
               expect(res.body.comments[0].author).to.eql('icellusedkars');
               expect(res.body.comments[2].comment_id).to.eql(2);
             }));
+          it('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/articles/1/comments?sort_by=puppies')
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('Invalid format');
+            }));
           it('GET - returns status 200 and applies page query if client provides one', () => request.get('/api/articles/1/comments?p=2&limit=2')
             .expect(200)
             .then((res) => {
               expect(res.body.comments[0].comment_id).to.eql(4);
               expect(res.body.comments).to.have.length(2);
+            }));
+          it('ERROR - responds with 400 if client enters a incorrect syntax for p value', () => request.get('/api/articles/1/comments?p=puppies')
+            .expect(400)
+            .then((res) => {
+              expect(res.body.message).to.equal('invalid input syntax for integer');
             }));
           it('GET - returns status 200 and applies ordering if client provides one', () => request.get('/api/articles/1/comments?sort_by=comment_id&sort_ascending=true')
             .expect(200)
@@ -426,6 +506,16 @@ describe('/*', () => {
                   expect(res.body.message).to.equal('invalid input syntax for integer');
                 });
             });
+            it('ERROR - reponds with 404 if client tries to update vote of a non-existent comment', () => {
+              const newVote = { inc_votes: 99 };
+              return request
+                .patch('/api/articles/1/comments/78654')
+                .send(newVote)
+                .expect(404)
+                .then((res) => {
+                  expect(res.body.message).to.equal('Page not found');
+                });
+            });
             it('DELETE - returns status 204 and returns and empty object', () => request
               .delete('/api/articles/1/comments/2')
               .expect(204)
@@ -442,6 +532,21 @@ describe('/*', () => {
               .expect(404)
               .then((res) => {
                 expect(res.body.message).to.equal('Page not found');
+              }));
+            it('ERROR - responds with a 404 if client tries to delete an comment on an article that does not exist', () => request.delete('/api/articles/100/comments/2')
+              .expect(404)
+              .then((res) => {
+                expect(res.body.message).to.equal('Page not found');
+              }));
+            it('ERROR - responds with a 400 if client tries to delete an comment on an article_id entered with incorrect syntax', () => request.delete('/api/articles/mitch/comments/2')
+              .expect(400)
+              .then((res) => {
+                expect(res.body.message).to.equal('invalid input syntax for integer');
+              }));
+            it('ERROR - responds with a 400 if client tries to delete an comment on an article with comment_id in incorrect syntax', () => request.delete('/api/articles/1/comments/mitch')
+              .expect(400)
+              .then((res) => {
+                expect(res.body.message).to.equal('invalid input syntax for integer');
               }));
           });
         });

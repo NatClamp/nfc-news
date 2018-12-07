@@ -5,11 +5,16 @@ exports.getAllComments = (req, res, next) => {
     limit = 10, sort_by = 'created_at', p = 1, sort_ascending,
   } = req.query;
   const { article_id } = req.params;
+
+  if (!Number.isInteger(+limit) || !Number.isInteger(+p)) return next({ code: '22P02' });
+
   const sorting = sort_ascending ? 'asc' : 'desc';
+
+
   return connection('comments')
     .select('comment_id', 'votes', 'created_at', 'body', 'username AS author')
     .where('article_id', article_id)
-    .limit(limit)
+    .limit(Math.abs(limit))
     .offset(limit * (p - 1))
     .orderBy(sort_by, sorting)
     .join('users', 'comments.user_id', '=', 'users.user_id')
@@ -47,7 +52,8 @@ exports.updateCommentVote = (req, res, next) => {
     })
     .returning('*')
     .then((comment) => {
-      res.status(200).send({ comment });
+      if (comment.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      return res.status(200).send({ comment });
     })
     .catch(next);
 };

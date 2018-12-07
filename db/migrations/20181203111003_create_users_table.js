@@ -4,9 +4,9 @@ exports.up = function (knex, Promise) {
       .increments('user_id')
       .primary()
       .unique();
-    usersTable.string('username').unique();
-    usersTable.string('avatar_url');
-    usersTable.string('name');
+    usersTable.string('username', 5000).unique();
+    usersTable.string('avatar_url', 5000);
+    usersTable.string('name', 5000);
   });
 };
 

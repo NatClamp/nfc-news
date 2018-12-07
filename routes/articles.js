@@ -38,6 +38,7 @@ router
 router
   .route('/:article_id/comments/:comment_id')
   .patch(updateCommentVote)
-  .delete(deleteComment);
+  .delete(deleteComment)
+  .all(handle405);
 
 module.exports = router;

@@ -4,13 +4,12 @@ exports.getArticles = (req, res, next) => {
   const {
     limit = 10, sort_by = 'created_at', p = 1, sort_ascending,
   } = req.query;
-  if (Number.isInteger(+req.params.topic) || !Number.isInteger(+limit)) {
-    return next({ code: 42703 });
-  }
+  if (Number.isInteger(+req.params.topic)) return next({ code: 42703 });
+  if (!Number.isInteger(+limit) || !Number.isInteger(+p)) return next({ code: '22P02' });
   const sorting = sort_ascending ? 'asc' : 'desc';
   return connection('articles')
     .select('articles.article_id', 'title', 'username AS author', 'articles.votes', 'articles.created_at', 'articles.topic')
-    .limit(limit)
+    .limit(Math.abs(limit))
     .offset((p - 1) * limit)
     .orderBy(sort_by, sorting)
     .join('users', 'articles.user_id', '=', 'users.user_id')
