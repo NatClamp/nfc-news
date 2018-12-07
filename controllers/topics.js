@@ -13,6 +13,9 @@ exports.addATopic = (req, res, next) => {
   return connection('topics')
     .insert(req.body)
     .returning('*')
-    .then(topic => res.status(201).send({ topic }))
+    .then((topic) => {
+      [topic] = topic;
+      return res.status(201).send({ topic });
+    })
     .catch(next);
 };

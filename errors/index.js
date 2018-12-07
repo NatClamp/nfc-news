@@ -31,7 +31,6 @@ exports.handle500 = (err, req, res, next) => {
     '2201X': 'OFFSET must not be negative',
   };
   if (codes[err.code]) res.status(500).send({ message: codes[err.code] });
-  else next(err);
 };
 
 exports.handle405 = (req, res, next) => {

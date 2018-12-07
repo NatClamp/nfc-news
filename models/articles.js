@@ -7,6 +7,7 @@ exports.getArticles = (req, res, next) => {
   if (Number.isInteger(+req.params.topic)) return next({ code: 42703, message: 'Invalid format' });
   if (!Number.isInteger(+limit) || !Number.isInteger(+p)) return next({ code: '22P02', message: 'invalid input syntax for integer' });
   if (+p < 0) return next({ code: '2201X', message: 'OFFSET must not be negative' });
+  // const validSorts = [article_id, title, body, votes, topic, user_id, created_at];
   const sorting = sort_ascending ? 'asc' : 'desc';
   return connection('articles')
     .select('articles.article_id', 'title', 'username AS author', 'articles.votes', 'articles.created_at', 'articles.topic')

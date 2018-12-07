@@ -46,8 +46,7 @@ describe('/*', () => {
           .send(newTopic)
           .expect(201)
           .then((res) => {
-            expect(res.body.topic).to.have.length(1);
-            expect(res.body.topic[0]).to.eql({
+            expect(res.body.topic).to.eql({
               description: 'The punniest reasons to be alive',
               slug: 'puns',
             });
@@ -162,7 +161,7 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(12);
           }));
-        it('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/topics/mitch/articles?sort_by=puppies')
+        it.only('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/topics/mitch/articles?sort_by=puppies')
           .expect(400)
           .then((res) => {
             expect(res.body.message).to.equal('Invalid format');
