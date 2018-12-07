@@ -6,6 +6,7 @@ exports.getAllComments = (req, res, next) => {
   } = req.query;
   const { article_id } = req.params;
   if (!Number.isInteger(+limit) || !Number.isInteger(+p)) return next({ code: '22P02' });
+  if (+p < 0) return next({ code: '2201X' });
   const sorting = sort_ascending ? 'asc' : 'desc';
   return connection('comments')
     .select('comment_id', 'votes', 'created_at', 'body', 'username AS author')

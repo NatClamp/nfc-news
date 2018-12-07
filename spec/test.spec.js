@@ -291,6 +291,11 @@ describe('/*', () => {
         .then((res) => {
           expect(res.body.articles[0].article_id).to.equal(3);
         }));
+      it('ERROR - responds with 500 if client enters negative value for p', () => request.get('/api/articles?p=-2&limit=1')
+        .expect(500)
+        .then((res) => {
+          expect(res.body.message).to.equal('OFFSET must not be negative');
+        }));
       it('GET - responds with 200 and an array of article objects, sorted to ascending if specified in query', () => request.get('/api/articles?sort_ascending=true')
         .expect(200)
         .then((res) => {
