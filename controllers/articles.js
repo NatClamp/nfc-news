@@ -11,7 +11,10 @@ exports.addArticlesWithTopic = (req, res, next) => {
   return connection('articles')
     .insert(copy)
     .returning('*')
-    .then(article => res.status(201).send({ article }))
+    .then((article) => {
+      [article] = article;
+      res.status(201).send({ article });
+    })
     .catch(next);
 };
 
@@ -29,6 +32,7 @@ exports.updateArticleVote = (req, res, next) => {
     .returning('*')
     .then((article) => {
       if (article.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      [article] = article;
       return res.status(200).send({ article });
     })
     .catch(next);

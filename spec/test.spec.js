@@ -161,7 +161,7 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(12);
           }));
-        it.only('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/topics/mitch/articles?sort_by=puppies')
+        it('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/topics/mitch/articles?sort_by=puppies')
           .expect(400)
           .then((res) => {
             expect(res.body.message).to.equal('Invalid format');
@@ -207,9 +207,8 @@ describe('/*', () => {
             .send(newArticle)
             .expect(201)
             .then((res) => {
-              expect(res.body.article).to.have.length(1);
-              expect(res.body.article[0].title).to.equal('toot toot');
-              expect(res.body.article[0]).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'user_id', 'created_at']);
+              expect(res.body.article.title).to.equal('toot toot');
+              expect(res.body.article).to.have.all.keys(['article_id', 'title', 'body', 'votes', 'topic', 'user_id', 'created_at']);
             });
         });
         it('ERROR - responds with 422 if the client provides a user_id that doesn\'t exist', () => {
@@ -332,7 +331,7 @@ describe('/*', () => {
             .send(vote)
             .expect(200)
             .then((res) => {
-              expect(res.body.article[0].votes).to.equal(5);
+              expect(res.body.article.votes).to.equal(5);
             });
         });
         it('PATCH - responds with 200 and upates the value on the votes key with a negative number', () => {
@@ -341,7 +340,7 @@ describe('/*', () => {
             .send(vote)
             .expect(200)
             .then((res) => {
-              expect(res.body.article[0].votes).to.equal(-5);
+              expect(res.body.article.votes).to.equal(-5);
             });
         });
         it('ERROR - responds with status 400 if client tries to update votes with an incorrect data type', () => {
@@ -458,8 +457,7 @@ describe('/*', () => {
               .send(newComment)
               .expect(201)
               .then((res) => {
-                expect(res.body.comment).to.have.length(1);
-                expect(res.body.comment[0].body).to.eql('What lovely bunting!');
+                expect(res.body.comment.body).to.eql('What lovely bunting!');
               });
           });
           it('ERROR - responds with 400 if client enters comment with a missing key', () => {
@@ -492,7 +490,7 @@ describe('/*', () => {
                 expect(res.body.message).to.equal('violates foreign key constraint');
               });
           });
-          describe('/:comment_id', () => {
+          describe.only('/:comment_id', () => {
             it('PATCH - responds with 200 and updates the votes on a comment with a positive number', () => {
               const newVote = { inc_votes: 5 };
               return request
@@ -500,8 +498,7 @@ describe('/*', () => {
                 .send(newVote)
                 .expect(200)
                 .then((res) => {
-                  expect(res.body.comment).to.have.length(1);
-                  expect(res.body.comment[0].votes).to.equal(19);
+                  expect(res.body.comment.votes).to.equal(19);
                 });
             });
             it('PATCH - responds with 200 and updates the votes on a comment with a negative number', () => {
@@ -511,8 +508,7 @@ describe('/*', () => {
                 .send(newVote)
                 .expect(200)
                 .then((res) => {
-                  expect(res.body.comment).to.have.length(1);
-                  expect(res.body.comment[0].votes).to.equal(9);
+                  expect(res.body.comment.votes).to.equal(9);
                 });
             });
             it('ERROR - reponds with 400 if client tries to update vote with an incorrect data type', () => {
@@ -590,8 +586,7 @@ describe('/*', () => {
         it('GET - responds with 200 and a user object', () => request.get('/api/users/1')
           .expect(200)
           .then((res) => {
-            expect(res.body.users).to.have.length(1);
-            expect(res.body.users[0]).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
+            expect(res.body.users).to.have.all.keys(['user_id', 'username', 'avatar_url', 'name']);
           }));
         it('ERROR - responds with 404 if the client enters a user_id that doesn\'t exist', () => request.get('/api/users/54')
           .expect(404)

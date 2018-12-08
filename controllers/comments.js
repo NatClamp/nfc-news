@@ -30,6 +30,7 @@ exports.addComment = (req, res, next) => {
     .insert(commentToAdd)
     .returning('*')
     .then((comment) => {
+      [comment] = comment;
       res.status(201).send({ comment });
     })
     .catch(next);
@@ -50,6 +51,7 @@ exports.updateCommentVote = (req, res, next) => {
     .returning('*')
     .then((comment) => {
       if (comment.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      [comment] = comment;
       return res.status(200).send({ comment });
     })
     .catch(next);
