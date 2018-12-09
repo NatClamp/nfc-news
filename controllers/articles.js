@@ -12,7 +12,6 @@ exports.addArticlesWithTopic = (req, res, next) => {
     .insert(copy)
     .returning('*')
     .then(([article]) => {
-      // [article] = article;
       res.status(201).send({ article });
     })
     .catch(next);
