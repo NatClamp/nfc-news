@@ -12,26 +12,15 @@ Ensure that you have psql installed and initialised.
 
 Clone down this repository from github.
 
-Install the dependencies by using `npm i` and `npx i knex` in terminal.
+Install the dependencies by using `npm i` and `npx i knex` in your terminal.
 
 Populate the `knexfile.js` with your configuration settings. If using linux, this file will also require your psql username and password.
 
+An example of what your `knexfile.js` should include:
 ```
 // Update with your config settings.
 
-const { DB_URL } = process.env;
-
 module.exports = {
-  production: {
-    client: 'pg',
-    connection: `${DB_URL}?ssl=true`,
-    migrations: {
-      directory: './db/migrations',
-    },
-    seeds: {
-      directory: './db/seed',
-    },
-  },
   development: {
     client: 'pg',
     connection: {
@@ -45,28 +34,16 @@ module.exports = {
     seeds: {
       directory: './db/seed',
     },
-  },
-  test: {
-    client: 'pg',
-    connection: {
-      database: 'test_news_database',
-      user: '<YOUR_USERNAME>',
-      password: '<YOUR_PASSWORD>',
-    },
-    migrations: {
-      directory: './db/migrations',
-    },
-    seeds: {
-      directory: './db/seed',
-    },
-  },
+  }
 };
 ```
 
 You can rollback, create tables and seed the tables with data by using the commands:
-`knex migrate:rollback`
-`knex migrate:latest`
-`knex seed:run`
+- `knex migrate:rollback`
+- `knex migrate:latest`
+- `knex seed:run`
+
+Now you should be able to start your serve by running the command `npm run dev` and using your browser to view the endpoints at URL `localhost:9090/api`
 
 ## Endpoints
 
@@ -89,7 +66,11 @@ The following endpoints serve data:
 
 ### Running Tests
 
-You can run tests on this service by using `npm t`
+You can run tests with mocha and chai (available within the spec directory) by using `npm t`.
+
+### Deployment
+
+To deploy the API, you need to include a production connection within the `knexfile.js`. that uses the deployed database URL and the query `?ssl=true`.
 
 ### Built With
 - `Express`
