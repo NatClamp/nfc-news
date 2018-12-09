@@ -11,8 +11,8 @@ exports.addArticlesWithTopic = (req, res, next) => {
   return connection('articles')
     .insert(copy)
     .returning('*')
-    .then((article) => {
-      [article] = article;
+    .then(([article]) => {
+      // [article] = article;
       res.status(201).send({ article });
     })
     .catch(next);
@@ -20,13 +20,13 @@ exports.addArticlesWithTopic = (req, res, next) => {
 
 exports.updateArticleVote = (req, res, next) => {
   if (typeof req.body.inc_votes === 'string') return next({ code: '22P02' });
-  const { inc_votes } = req.body;
+  const inc_votes = req.body.inc_votes === undefined ? 0 : req.body.inc_votes;
   const { article_id } = req.params;
   return connection('articles')
     .select('*')
     .where('article_id', article_id)
     .modify((articleQuery) => {
-      if (inc_votes > 0) articleQuery.increment('votes', inc_votes);
+      if (inc_votes >= 0) articleQuery.increment('votes', inc_votes);
       else articleQuery.decrement('votes', Math.abs(inc_votes));
     })
     .returning('*')

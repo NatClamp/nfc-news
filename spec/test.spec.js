@@ -161,10 +161,10 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(12);
           }));
-        it('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/topics/mitch/articles?sort_by=puppies')
-          .expect(400)
+        it('GET - ignores sort_by query if client enters criteria that does not exist in the table', () => request.get('/api/topics/mitch/articles?sort_by=puppies')
+          .expect(200)
           .then((res) => {
-            expect(res.body.message).to.equal('Invalid format');
+            expect(res.body.articles[0].article_id).to.be.equal(1);
           }));
         it('GET - responds with 200 and an array of article objects, starting at page specified in query', () => request.get('/api/topics/mitch/articles?p=2&limit=2')
           .expect(200)
@@ -186,11 +186,6 @@ describe('/*', () => {
           .then((res) => {
             expect(res.body.articles[0].article_id).to.equal(8);
             expect(res.body.articles).to.have.length(2);
-          }));
-        it('ERROR - responds with 400 if the client enters a value for query with incorrect syntax', () => request.get('/api/topics/mitch/articles?sort_by=jdhaffb')
-          .expect(400)
-          .then((res) => {
-            expect(res.body.message).to.equal('Invalid format');
           }));
         it('ERROR - ignores any queries that are incorrectly entered', () => request.get('/api/topics/mitch/articles?soWOOrt_by=article_id')
           .expect(200)
@@ -259,6 +254,20 @@ describe('/*', () => {
               expect(res.body.message).to.equal('METHOD NOT ALLOWED');
             });
         });
+        it('ERROR - post resonds with 404 when trying to add an article to a non-existent topic', () => {
+          const newArticle = {
+            title: 'toot toot',
+            user_id: 2,
+            body: 'I like plants, do you?',
+          };
+          return request
+            .post('/api/topics/plants/articles')
+            .send(newArticle)
+            .expect(404)
+            .then((res) => {
+              expect(res.body.message).to.equal('Topic does not exist');
+            });
+        });
       });
     });
     describe('/articles', () => {
@@ -304,16 +313,11 @@ describe('/*', () => {
         .then((res) => {
           expect(res.body.articles[0].article_id).to.equal(8);
         }));
-      it('ERROR - responds with 400 if the client incorrectly enters a query', () => request.get('/api/articles?sort_by=jdhaffb')
-        .expect(400)
-        .then((res) => {
-          expect(res.body.message).to.equal('Invalid format');
-        }));
       describe('/:article_id', () => {
         it('GET - responds with 200 and an article object', () => request.get('/api/articles/4')
           .expect(200)
           .then((res) => {
-            expect(res.body.articles[0].article_id).to.equal(4);
+            expect(res.body.articles.article_id).to.equal(4);
           }));
         it('ERROR - responds with 400 if client enters article_id of wrong data type', () => request.get('/api/articles/hydrangea')
           .expect(400)
@@ -343,6 +347,12 @@ describe('/*', () => {
               expect(res.body.article.votes).to.equal(-5);
             });
         });
+        it('PATCH - responds with 200 and an unaltered article if no body is given', () => request.patch('/api/articles/3')
+          .send()
+          .expect(200)
+          .then((res) => {
+            expect(res.body.article.votes).to.equal(0);
+          }));
         it('ERROR - responds with status 400 if client tries to update votes with an incorrect data type', () => {
           const vote = { inc_votes: 'KUDOS' };
           return request.patch('/api/articles/3')
@@ -424,10 +434,10 @@ describe('/*', () => {
               expect(res.body.comments[0].author).to.eql('icellusedkars');
               expect(res.body.comments[2].comment_id).to.eql(2);
             }));
-          it('ERROR - responds with 400 if client enters a sort_by query that doesn\'t exist', () => request.get('/api/articles/1/comments?sort_by=puppies')
-            .expect(400)
+          it('GET - returns unsorted comments if client enters sort criteria that does not exist', () => request.get('/api/articles/1/comments?sort_by=puppies')
+            .expect(200)
             .then((res) => {
-              expect(res.body.message).to.equal('Invalid format');
+              expect(res.body.comments[0].comment_id).to.equal(2);
             }));
           it('GET - returns status 200 and applies page query if client provides one', () => request.get('/api/articles/1/comments?p=2&limit=2')
             .expect(200)
@@ -444,11 +454,6 @@ describe('/*', () => {
             .expect(200)
             .then((res) => {
               expect(res.body.comments[0].comment_id).to.eql(2);
-            }));
-          it('ERROR - responds with 400 if the client incorrectly enters a query with invalid syntax', () => request.get('/api/articles/1/comments?sort_by=jdhaffb')
-            .expect(400)
-            .then((res) => {
-              expect(res.body.message).to.equal('Invalid format');
             }));
           it('POST - responds with 201 and the posted object with user_id and body', () => {
             const newComment = { user_id: 1, body: 'What lovely bunting!' };
@@ -490,7 +495,7 @@ describe('/*', () => {
                 expect(res.body.message).to.equal('violates foreign key constraint');
               });
           });
-          describe.only('/:comment_id', () => {
+          describe('/:comment_id', () => {
             it('PATCH - responds with 200 and updates the votes on a comment with a positive number', () => {
               const newVote = { inc_votes: 5 };
               return request
@@ -511,6 +516,12 @@ describe('/*', () => {
                   expect(res.body.comment.votes).to.equal(9);
                 });
             });
+            it('PATCH - responds with 200 and an unaltered article if no body is given', () => request.patch('/api/articles/1/comments/2')
+              .send()
+              .expect(200)
+              .then((res) => {
+                expect(res.body.comment.votes).to.equal(14);
+              }));
             it('ERROR - reponds with 400 if client tries to update vote with an incorrect data type', () => {
               const newVote = { inc_votes: 'i like this one' };
               return request
@@ -537,12 +548,6 @@ describe('/*', () => {
               .then((res) => {
                 expect(res.body).to.eql({});
               }));
-            // .then(() => request
-            //   .get('/api/articles/1/comments/2')
-            //   .expect(404))
-            // .then((res) => {
-            //   expect(res.body.message).to.equal('Page not found');
-            // }));
             it('ERROR - responds with a 404 if client tries to delete an comment that does not exist', () => request.delete('/api/articles/1/comments/235')
               .expect(404)
               .then((res) => {
