@@ -17,6 +17,7 @@ Install the dependencies by using `npm i` and `npx i knex` in your terminal.
 Populate the `knexfile.js` with your configuration settings. If using linux, this file will also require your psql username and password.
 
 An example of what your `knexfile.js` should include:
+
 ```
 // Update with your config settings.
 
@@ -39,6 +40,7 @@ module.exports = {
 ```
 
 You can rollback, create tables and seed the tables with data by using the commands:
+
 - `knex migrate:rollback`
 - `knex migrate:latest`
 - `knex seed:run`
@@ -48,7 +50,8 @@ Now you should be able to start your serve by running the command `npm run dev` 
 ## Endpoints
 
 The following endpoints serve data:
-- **GET** /api 
+
+- **GET** /api
 - **GET** /api/topics
 - **POST** /api/topics
 - **GET** /api/topics/:topic/articles
@@ -73,12 +76,14 @@ You can run tests with mocha and chai (available within the spec directory) by u
 To deploy the API, you need to include a production connection within the `knexfile.js`. that uses the deployed database URL and the query `?ssl=true`.
 
 ### Built With
+
 - `Express`
 - `Knex`
 - `Pg-Promise`
 - `Body-Parser`
 
 ### Tested With
+
 - `mocha`
 - `chai`
 - `husky`
