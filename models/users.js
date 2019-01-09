@@ -11,5 +11,5 @@ exports.getUsers = (req, res, next) => connection('users')
       }
       if (users.length === 1) [users] = users;
       return res.status(200).send({ users });
-    })
-    .catch(next);
+    });
+// .catch(next);

@@ -2,10 +2,10 @@ const router = require('express').Router();
 const { getAllUsers, getSingleUser } = require('../controllers/users');
 const { handle405 } = require('../errors/index');
 
-// router.param('user_id', (req, res, next, username) => {
-//   if (Number.isInteger(+user_id)) next();
-//   else next({ code: '22P02' });
-// });
+router.param('username', (req, res, next, username) => {
+  if (Number.isInteger(+username)) next({ code: '22P02' });
+  else next();
+});
 
 router
   .route('/')

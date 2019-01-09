@@ -1,7 +1,7 @@
 /* eslint "no-console":0 */
 
 exports.handle404 = (err, req, res, next) => {
-  console.log(err);
+  // console.log(err);
   if (err.status === 404) res.status(404).send({ message: err.message });
   else if (
     err.code === '23503'
@@ -26,7 +26,7 @@ exports.handle400 = (err, req, res, next) => {
   const codes = {
     42703: 'Invalid format',
     23502: 'missing value violates not-null constraint',
-    // '22P02': 'invalid input syntax for integer',
+    '22P02': 'invalid input syntax for integer',
   };
   if (codes[err.code]) res.status(400).send({ message: codes[err.code] });
   else next(err);
