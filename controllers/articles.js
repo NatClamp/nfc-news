@@ -6,7 +6,13 @@ exports.getArticlesController = (req, res, next) => {
 };
 
 exports.addArticlesWithTopic = (req, res, next) => {
-  if (!req.body.title || !req.body.user_id || !req.body.body) return next({ status: 400, code: 23502, message: 'missing value violates not-null constraint' });
+  if (!req.body.title || !req.body.user_id || !req.body.body) {
+    return next({
+      status: 400,
+      code: 23502,
+      message: 'missing value violates not-null constraint',
+    });
+  }
   const copy = { ...req.body, ...req.params };
   return connection('articles')
     .insert(copy)
@@ -30,7 +36,9 @@ exports.updateArticleVote = (req, res, next) => {
     })
     .returning('*')
     .then((article) => {
-      if (article.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      if (article.length === 0) {
+        return Promise.reject({ status: 404, message: 'Page not found' });
+      }
       [article] = article;
       return res.status(200).send({ article });
     })
@@ -45,7 +53,9 @@ exports.deleteArticle = (req, res, next) => {
     .del()
     .returning('*')
     .then((article) => {
-      if (article.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      if (article.length === 0) {
+        return Promise.reject({ status: 404, message: 'Page not found' });
+      }
       return res.status(204).send({});
     })
     .catch(next);

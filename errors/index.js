@@ -23,7 +23,6 @@ exports.handle422 = (err, req, res, next) => {
 };
 
 exports.handle400 = (err, req, res, next) => {
-  console.log('hello');
   const codes = {
     42703: 'Invalid format',
     23502: 'missing value violates not-null constraint',
