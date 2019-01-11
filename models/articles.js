@@ -48,7 +48,9 @@ exports.getArticles = (req, res, next) => {
       }
     })
     .then((articles) => {
-      // if (articles.length === 0) { return Promise.reject({ status: 404, message: 'Page not found' }); }
+      if (articles.length === 0) {
+        return Promise.reject({ status: 404, message: 'Page not found' });
+      }
       if (articles.length === 1) [articles] = articles;
       return res.status(200).send({ articles });
     })
