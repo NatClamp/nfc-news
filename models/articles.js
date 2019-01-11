@@ -41,13 +41,13 @@ exports.getArticles = (req, res, next) => {
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .count('comments.article_id AS comment_count')
     .groupBy('articles.article_id', 'users.username')
-    .modify((articleQuery) => {
+    .modify(articleQuery => {
       if (req.params.topic) articleQuery.where('topic', req.params.topic);
       else if (req.params.article_id) {
         articleQuery.where('articles.article_id', req.params.article_id);
       }
     })
-    .then((articles) => {
+    .then(articles => {
       if (articles.length === 0) {
         return Promise.reject({ status: 404, message: 'Page not found' });
       }
