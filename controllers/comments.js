@@ -1,14 +1,23 @@
 const connection = require('../db/connection');
 
 exports.getAllComments = (req, res, next) => {
-  const {
-    limit = 10, p = 1, sort_ascending,
-  } = req.query;
+  const { limit = 10, p = 1, sort_ascending } = req.query;
   const { article_id } = req.params;
-  if (!Number.isInteger(+limit) || !Number.isInteger(+p)) return next({ code: '22P02' });
+  if (!Number.isInteger(+limit) || !Number.isInteger(+p)) {
+    return next({ code: '22P02' });
+  }
   if (+p < 0) return next({ code: '2201X' });
-  const validSorts = ['comment_id', 'article_id', 'body', 'votes', 'user_id', 'created_at'];
-  const sort_by = validSorts.includes(req.query.sort_by) ? req.query.sort_by : 'created_at';
+  const validSorts = [
+    'comment_id',
+    'article_id',
+    'body',
+    'votes',
+    'user_id',
+    'created_at',
+  ];
+  const sort_by = validSorts.includes(req.query.sort_by)
+    ? req.query.sort_by
+    : 'created_at';
   const sorting = sort_ascending ? 'asc' : 'desc';
   return connection('comments')
     .select('comment_id', 'votes', 'created_at', 'body', 'username AS author')
@@ -18,7 +27,8 @@ exports.getAllComments = (req, res, next) => {
     .orderBy(sort_by, sorting)
     .join('users', 'comments.user_id', '=', 'users.user_id')
     .then((comments) => {
-      if (comments.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      //  if (comments.length === 0) {
+      //   return Promise.reject({ status: 404, message: 'Page not found' });}
       if (comments.length === 1) [comments] = comments;
       return res.status(200).send({ comments });
     })
@@ -26,7 +36,13 @@ exports.getAllComments = (req, res, next) => {
 };
 
 exports.addComment = (req, res, next) => {
-  if (!req.body.body || !req.body.user_id) return next({ status: 400, code: 23502, message: 'missing value violates not-null constraint' });
+  if (!req.body.body || !req.body.user_id) {
+    return next({
+      status: 400,
+      code: 23502,
+      message: 'missing value violates not-null constraint',
+    });
+  }
   const { article_id } = req.params;
   const commentToAdd = { ...req.body, article_id };
   return connection('comments')
@@ -52,7 +68,9 @@ exports.updateCommentVote = (req, res, next) => {
     })
     .returning('*')
     .then((comment) => {
-      if (comment.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      if (comment.length === 0) {
+        return Promise.reject({ status: 404, message: 'Page not found' });
+      }
       [comment] = comment;
       return res.status(200).send({ comment });
     })
@@ -68,7 +86,9 @@ exports.deleteComment = (req, res, next) => {
     .del()
     .returning('*')
     .then((comment) => {
-      if (comment.length === 0) return Promise.reject({ status: 404, message: 'Page not found' });
+      if (comment.length === 0) {
+        return Promise.reject({ status: 404, message: 'Page not found' });
+      }
       return res.status(204).send({});
     })
     .catch(next);

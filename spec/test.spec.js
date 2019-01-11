@@ -121,7 +121,7 @@ describe('/*', () => {
             expect(res.body.message).to.equal('Invalid format');
           });
       });
-      describe('/:topics/articles', () => {
+      describe.only('/:topics/articles', () => {
         it('GET - responds with 200 and an array of article objects for the chosen topic with default values for limit, sort_by and order', () => request
           .get('/api/topics/mitch/articles')
           .expect(200)
@@ -140,11 +140,17 @@ describe('/*', () => {
             expect(res.body.articles).to.have.length(10);
             expect(res.body.articles[0].article_id).to.equal(1);
           }));
-        it('ERROR - responds with status 404 if client enters topic that does not exist but in correct syntax', () => request
+        // it('ERROR - responds with status 404 if client enters topic that does not exist but in correct syntax', () => request
+        //   .get('/api/topics/puppies/articles')
+        //   .expect(404)
+        //   .then((res) => {
+        //     expect(res.body.message).to.equal('Page not found');
+        //   }));
+        it.only('Responds with empty array if client enters topic that does not exist but in correct syntax', () => request
           .get('/api/topics/puppies/articles')
-          .expect(404)
+          .expect(200)
           .then((res) => {
-            expect(res.body.message).to.equal('Page not found');
+            expect(res.body.articles).length.to.equal(0);
           }));
         it('ERROR - responds with status 400 if client enters topic using incorrect syntax', () => request
           .get('/api/topics/1/articles')
