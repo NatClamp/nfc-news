@@ -121,7 +121,7 @@ describe('/*', () => {
             expect(res.body.message).to.equal('Invalid format');
           });
       });
-      describe.only('/:topics/articles', () => {
+      describe('/:topics/articles', () => {
         it('GET - responds with 200 and an array of article objects for the chosen topic with default values for limit, sort_by and order', () => request
           .get('/api/topics/mitch/articles')
           .expect(200)
@@ -488,11 +488,11 @@ describe('/*', () => {
               expect(res.body.comments).to.have.length(10);
               expect(res.body.comments[0].comment_id).to.equal(2);
             }));
-          it('ERROR - returns 404 if client enters an article number for an existing article that does not have any comments / a non-existent article_id', () => request
+          it('returns empty array if client enters an article number for an existing article that does not have any comments', () => request
             .get('/api/articles/8/comments')
-            .expect(404)
+            .expect(200)
             .then((res) => {
-              expect(res.body.message).to.equal('Page not found');
+              expect(res.body.comments).to.eql([]);
             }));
           it('ERROR - returns 400 if client enters an article_id with incorrect syntax', () => request
             .get('/api/articles/error/comments')
